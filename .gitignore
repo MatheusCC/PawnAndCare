@@ -37,6 +37,10 @@
 # VS Code
 .vscode/*
 
+# Documents
+Docs/*
+!Docs/README.txt
+
 # Gradle cache directory
 .gradle/
 
