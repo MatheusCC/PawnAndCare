@@ -16,6 +16,10 @@ namespace PawsAndCare.Building
         private int height = 20;
         [SerializeField]
         private float cellSize = 1.0f;
+        [SerializeField]
+        private Color occupiedGizmoColor = new Color(0.88f, 0.44f, 0.33f, 0.4f);
+        [SerializeField]
+        private Color unwalkableGizmoColor = new Color(0.18f, 0.20f, 0.21f, 0.4f);
 
         private GridCell[,] cells;
         private readonly List<Room> rooms = new List<Room>();
@@ -104,7 +108,7 @@ namespace PawsAndCare.Building
             {
                 GridCell cell = GetCell(cellPos);
 
-                if(cell != null)
+                if (cell != null)
                 {          
                     if (cell.RoomId == 0)
                     {
@@ -169,6 +173,34 @@ namespace PawsAndCare.Building
                 Vector3 start = origin + new Vector3(0f, 0f, y * cellSize);
                 Vector3 end = origin + new Vector3(width * cellSize, 0f, y * cellSize);
                 Gizmos.DrawLine(start, end);
+            }
+
+            if (cells != null)
+            {
+                Vector3 overlaySize = new Vector3(cellSize * 0.9f, 0.05f, cellSize * 0.9f);
+
+                for (int x = 0; x < width; x++)
+                {
+                    for (int y = 0; y < height; y++)
+                    {
+                        GridCell cell = cells[x, y];
+
+                        if (cell.IsOccupied || !cell.IsWalkable)
+                        {
+                            if (cell.IsOccupied)
+                            {
+                                Gizmos.color = occupiedGizmoColor;
+                            }
+                            else
+                            {
+                                Gizmos.color = unwalkableGizmoColor;
+                            }
+
+                            Vector3 cellCenter = GridToWorld(new Vector2Int(x, y));
+                            Gizmos.DrawCube(cellCenter, overlaySize);
+                        }
+                    }
+                }
             }
         }
     }

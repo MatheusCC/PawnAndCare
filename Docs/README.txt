@@ -1,0 +1,1 @@
+Design documents are stored externally. Contact the developer for access.
