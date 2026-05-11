@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace PawsAndCare.Building
@@ -14,13 +15,16 @@ namespace PawsAndCare.Building
         [SerializeField]
         private int height = 20;
         [SerializeField]
-        private float cellSize = 1f;
+        private float cellSize = 1.0f;
 
         private GridCell[,] cells;
+        private readonly List<Room> rooms = new List<Room>();
+        private int nextRoomId = 1;
 
         public int Width { get { return width; } }
         public int Height { get { return height; } }
         public float CellSize { get { return cellSize; } }
+        public List<Room> Rooms { get { return rooms; } }
 
         private void Awake()
         {
@@ -79,15 +83,65 @@ namespace PawsAndCare.Building
         /// </summary>
         public bool IsCellAvailable(Vector2Int position)
         {
-            bool available = false;
             GridCell cell = GetCell(position);
 
-            if (cell != null && !cell.IsOccupied && cell.IsWalkable)
-            {
-                available = true;
-            }
+            bool available = cell != null && !cell.IsOccupied && cell.IsWalkable;
 
             return available;
+        }
+
+        /// <summary>
+        /// Creates a new room of the given type and assigns the listed cells to it.
+        /// Cells that are out of bounds or already assigned to another room are
+        /// skipped with a warning. Returns the created Room.
+        /// </summary>
+        public Room CreateRoom(RoomType type, List<Vector2Int> cellsToAssign)
+        {
+            Room room = new Room(nextRoomId, type);
+            nextRoomId++;
+
+            foreach (Vector2Int cellPos in cellsToAssign)
+            {
+                GridCell cell = GetCell(cellPos);
+
+                if(cell != null)
+                {          
+                    if (cell.RoomId == 0)
+                    {
+                        cell.SetRoomId(room.RoomId);
+                        room.AddCell(cellPos);     
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"[GridSystem] CreateRoom: cell {cellPos} already belongs to room {cell.RoomId}, skipping.", this);
+                    }              
+                }
+                else
+                {
+                    Debug.LogWarning($"[GridSystem] CreateRoom: cell {cellPos} is out of bounds, skipping.", this);
+                }              
+            }
+
+            rooms.Add(room);
+            return room;
+        }
+
+        /// <summary>
+        /// Returns the room with the given ID, or null if not found.
+        /// </summary>
+        public Room GetRoomById(int id)
+        {
+            Room result = null;
+
+            foreach (Room room in rooms)
+            {
+                if (room.RoomId == id)
+                {
+                    result = room;
+                }
+            }
+
+            return result;
         }
 
         private bool IsInBounds(Vector2Int position)
