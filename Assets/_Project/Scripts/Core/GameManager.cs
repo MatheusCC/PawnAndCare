@@ -38,16 +38,6 @@ namespace PawsAndCare.Core
             previousState = initialState;
         }
 
-        private void Update()
-        {
-            if(Input.GetKeyDown(KeyCode.KeypadEnter))
-            {
-                ChangeState(GameState.PAUSED);
-            }           
-        }
-
-
-
         /// <summary>
         /// Transitions the game to a new state. Same-state calls are ignored.
         /// </summary>
