@@ -63,8 +63,12 @@ namespace PawsAndCare.Building
         /// </summary>
         public Vector3 GridToWorld(Vector2Int gridPos)
         {
+            // World position = grid origin (transform.position)
+            //                + grid index × cell size  (offset to the cell's near corner)
+            //                + half a cell             (offset from corner to center)
             float worldX = transform.position.x + (gridPos.x * cellSize) + (cellSize * 0.5f);
             float worldZ = transform.position.z + (gridPos.y * cellSize) + (cellSize * 0.5f);
+            // Y stays at the grid's ground level — the grid is a flat plane in XZ.
             float worldY = transform.position.y;
             return new Vector3(worldX, worldY, worldZ);
         }
@@ -75,8 +79,12 @@ namespace PawsAndCare.Building
         /// </summary>
         public Vector2Int WorldToGrid(Vector3 worldPos)
         {
+            // Express the world point in grid-local space (subtract the grid origin).
             float localX = worldPos.x - transform.position.x;
             float localZ = worldPos.z - transform.position.z;
+            // FloorToInt (not (int) truncation): floor rounds toward negative infinity,
+            // so a world point at local X = -0.3 with cellSize 1 maps to grid x = -1,
+            // not 0. That matters for out-of-bounds detection on the negative side.
             int gridX = Mathf.FloorToInt(localX / cellSize);
             int gridY = Mathf.FloorToInt(localZ / cellSize);
             return new Vector2Int(gridX, gridY);
@@ -161,22 +169,29 @@ namespace PawsAndCare.Building
             Gizmos.color = Color.white;
             Vector3 origin = transform.position;
 
+            // Vertical gridlines: one for each column boundary (inclusive on both ends,
+            // so a width-N grid draws N+1 lines).
             for (int x = 0; x <= width; x++)
             {
-                Vector3 start = origin + new Vector3(x * cellSize, 0f, 0f);
-                Vector3 end = origin + new Vector3(x * cellSize, 0f, height * cellSize);
+                Vector3 start = origin + new Vector3(x * cellSize, 0.0f, 0.0f);
+                Vector3 end = origin + new Vector3(x * cellSize, 0.0f, height * cellSize);
                 Gizmos.DrawLine(start, end);
             }
 
+            // Horizontal gridlines: one for each row boundary.
             for (int y = 0; y <= height; y++)
             {
-                Vector3 start = origin + new Vector3(0f, 0f, y * cellSize);
-                Vector3 end = origin + new Vector3(width * cellSize, 0f, y * cellSize);
+                Vector3 start = origin + new Vector3(0.0f, 0.0f, y * cellSize);
+                Vector3 end = origin + new Vector3(width * cellSize, 0.0f, y * cellSize);
                 Gizmos.DrawLine(start, end);
             }
 
+            // Per-cell state overlay only renders at runtime (cells[,] is allocated in
+            // Awake). In edit mode the grid is just the white lines above.
             if (cells != null)
             {
+                // Overlay is a flat tile, 90% of cell width to leave a small gap that
+                // makes the underlying gridlines still visible at cell boundaries.
                 Vector3 overlaySize = new Vector3(cellSize * 0.9f, 0.05f, cellSize * 0.9f);
 
                 for (int x = 0; x < width; x++)
@@ -187,6 +202,9 @@ namespace PawsAndCare.Building
 
                         if (cell.IsOccupied || !cell.IsWalkable)
                         {
+                            // Occupied takes priority over unwalkable for visibility —
+                            // an occupied cell is more important to surface than a
+                            // generic terrain block.
                             if (cell.IsOccupied)
                             {
                                 Gizmos.color = occupiedGizmoColor;

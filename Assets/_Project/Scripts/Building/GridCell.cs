@@ -3,9 +3,8 @@ using UnityEngine;
 namespace PawsAndCare.Building
 {
     /// <summary>
-    /// Single cell in the grid. Owns its grid coordinate, occupancy, room assignment,
-    /// and walkability. Position is fixed at construction; the rest is mutated through
-    /// the explicit setter methods so changes happen in one place.
+    /// Single cell in the grid — owns its coordinate, occupancy, room assignment,
+    /// and walkability. Position is fixed at construction; mutate the rest via setters.
     /// </summary>
     public class GridCell
     {

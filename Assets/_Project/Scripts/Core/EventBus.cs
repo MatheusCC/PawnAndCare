@@ -5,11 +5,10 @@ using UnityEngine;
 namespace PawsAndCare.Core
 {
     /// <summary>
-    /// Static publish/subscribe event bus. Decouples systems by letting them communicate
-    /// through events without holding direct references to each other.
-    ///
-    /// Convention: event types are structs (zero-allocation publishing).
+    /// Static publish/subscribe event bus. Decouples systems by letting them
+    /// communicate through events without holding direct references.
     /// </summary>
+    // Convention: event types are structs (zero-allocation publishing).
     public static class EventBus
     {
         private static readonly Dictionary<Type, List<Delegate>> handlers = new Dictionary<Type, List<Delegate>>();
@@ -54,9 +53,7 @@ namespace PawsAndCare.Core
         }
 
         /// <summary>
-        /// Sends an event to all subscribed handlers for type T.
-        /// Exceptions thrown by any one handler are logged and don't stop the remaining handlers from firing.
-        /// Safe to Subscribe/Unsubscribe from inside a handler — iteration uses a snapshot.
+        /// Sends an event to all handlers subscribed to type T.
         /// </summary>
         public static void Publish<T>(T eventData)
         {
@@ -64,10 +61,14 @@ namespace PawsAndCare.Core
 
             if (handlers.TryGetValue(eventType, out List<Delegate> list))
             {
+                // Snapshot the list so a handler that calls Subscribe/Unsubscribe
+                // during dispatch doesn't trigger "Collection modified" exceptions.
                 Delegate[] snapshot = list.ToArray();
 
                 foreach (Delegate del in snapshot)
                 {
+                    // Safe cast: only handlers added through Subscribe<T> end up
+                    // in this drawer, so they're all Action<T>.
                     Action<T> typedHandler = (Action<T>)del;
 
                     try
@@ -76,6 +77,8 @@ namespace PawsAndCare.Core
                     }
                     catch (Exception ex)
                     {
+                        // Log and continue: one bad subscriber must not break the
+                        // chain for everyone else listening to this event.
                         Debug.LogException(ex);
                     }
                 }

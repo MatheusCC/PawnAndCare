@@ -16,9 +16,8 @@ namespace PawsAndCare.Building
     }
 
     /// <summary>
-    /// A logical grouping of grid cells. Tracks its identifier, type, member cells,
-    /// and the objects placed within it. Cells and placed objects can be added or
-    /// removed after construction to allow layout flexibility.
+    /// A logical grouping of grid cells — tracks its identifier, type, member cells,
+    /// and the objects placed within it.
     /// </summary>
     public class Room
     {
