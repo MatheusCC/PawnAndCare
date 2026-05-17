@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
+using Unity.AI.Navigation;
 
 namespace PawsAndCare.Building
 {
@@ -68,7 +70,9 @@ namespace PawsAndCare.Building
     public class FacilityBuilder : MonoBehaviour
     {
         [SerializeField]
-        private GridSystem gridSystem;
+        private GridSystem gridSystem = null;
+        [SerializeField]
+        private NavMeshSurface navMeshSurface = null;
         [SerializeField]
         private float floorThickness = 0.1f;
         [SerializeField]
@@ -101,6 +105,16 @@ namespace PawsAndCare.Building
                 foreach (StationPlaceholder station in stationPlaceholders)
                 {
                     BuildStation(station);
+                }
+
+                // Bake the NavMesh at runtime after all geometry is spawned.
+                if (navMeshSurface != null)
+                {
+                    navMeshSurface.BuildNavMesh();
+                }
+                else
+                {
+                    Debug.LogWarning("[FacilityBuilder] NavMeshSurface reference is missing — assign one in the inspector.", this);
                 }
             }
             else
@@ -216,6 +230,11 @@ namespace PawsAndCare.Building
             {
                 renderer.material.color = station.Color;
             }
+
+            // Mark station as a non-walkable obstacle for pathfinding.
+            NavMeshModifier modifier = stationObj.AddComponent<NavMeshModifier>();
+            modifier.overrideArea = true;
+            modifier.area = NavMesh.GetAreaFromName("Not Walkable");
 
             GridCell cell = gridSystem.GetCell(station.GridPosition);
 
