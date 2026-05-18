@@ -9,11 +9,34 @@ namespace PawsAndCare.Workers
     [RequireComponent(typeof(NavMeshAgent))]
     public class Worker : MonoBehaviour
     {
+        [SerializeField]
+        [Tooltip("Visual shown under the worker when selected by the player. Disabled by default.")]
+        private GameObject selectionIndicator = null;
+
         private NavMeshAgent navMeshAgent = null;
 
         private void Awake()
         {
             navMeshAgent = GetComponent<NavMeshAgent>();
+
+            // Force the indicator off at boot so prefab-authoring mistakes (left enabled in editor)
+            // don't produce a "selected" worker on spawn.
+            SetSelectionIndicatorActive(false);
+        }
+
+        /// <summary>
+        /// Toggles the selection indicator visual. Called by AgentController on selection change.
+        /// </summary>
+        public void SetSelectionIndicatorActive(bool selected)
+        {
+            if (selectionIndicator != null)
+            {
+                selectionIndicator.SetActive(selected);
+            }
+            else
+            {
+                Debug.LogWarning("[Worker] Missing selection indicator reference!!", this);
+            }
         }
 
         /// <summary>

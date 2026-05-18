@@ -4,10 +4,10 @@ using PawsAndCare.Services;
 namespace PawsAndCare.Workers
 {
     /// <summary>
-    /// Worker template definition: role, speed, cost, and skill ratings per service type.
+    /// Worker template data: role, speed, cost, and skill ratings per service type.
     /// </summary>
-    [CreateAssetMenu(fileName = "Worker_", menuName = "PawsAndCare/Workers/Worker Definition")]
-    public class WorkerDefinition : ScriptableObject
+    [CreateAssetMenu(fileName = "Worker_", menuName = "PawsAndCare/Workers/Worker Data")]
+    public class WorkerData : ScriptableObject
     {
         [System.Serializable]
         public struct SkillRating

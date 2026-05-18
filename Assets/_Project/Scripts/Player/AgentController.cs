@@ -70,7 +70,18 @@ namespace PawsAndCare.Player
                 if (clickedWorker != null)
                 {
                     // Click landed on a Worker → make it the controlled agent.
-                    selectedWorker = clickedWorker;
+                    // Clear the previous selection's indicator first; the new one gets its own indicator.
+                    // Skip the toggle when clicking the already-selected worker (no-op selection).
+                    if (selectedWorker != clickedWorker)
+                    {
+                        if (selectedWorker != null)
+                        {
+                            selectedWorker.SetSelectionIndicatorActive(false);
+                        }
+
+                        selectedWorker = clickedWorker;
+                        selectedWorker.SetSelectionIndicatorActive(true);
+                    }
                 }
                 else if (selectedWorker != null)
                 {

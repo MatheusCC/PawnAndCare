@@ -5,8 +5,8 @@ namespace PawsAndCare.Services
     /// <summary>
     /// Service template: type, duration, price, and required station type.
     /// </summary>
-    [CreateAssetMenu(fileName = "Service_", menuName = "PawsAndCare/Services/Service Definition")]
-    public class ServiceDefinition : ScriptableObject
+    [CreateAssetMenu(fileName = "Service_", menuName = "PawsAndCare/Services/Service Data")]
+    public class ServiceData : ScriptableObject
     {
         [SerializeField]
         private ServiceType serviceType = ServiceType.GROOMING;

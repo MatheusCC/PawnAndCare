@@ -127,10 +127,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b89ab5b03c7a614388a19014e656360, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PawsAndCare.Services.ServiceStation
-  serviceDefinition: {fileID: 11400000, guid: 06cfa0c89f3394d4086f6ef7a0a4b798, type: 2}
+  serviceData: {fileID: 0}
   workerAnchor: {fileID: 7902732899866262741}
   isOccupied: 0
   condition: 100
+  interactableType: 0
+  outlineMaterial: {fileID: 2100000, guid: 713d350ecdbe0064aac2995fc0a51a7b, type: 2}
 --- !u!114 &711510645984974284
 MonoBehaviour:
   m_ObjectHideFlags: 0
