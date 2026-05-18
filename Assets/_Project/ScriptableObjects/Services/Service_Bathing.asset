@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be389cde82421464f8cc7a380330e94d, type: 3}
   m_Name: Service_Bathing
   m_EditorClassIdentifier: Assembly-CSharp::PawsAndCare.Services.ServiceDefinition
-  serviceType: 0
+  serviceType: 1
   baseDuration: 60
   basePrice: 25
-  requiredStationType: GroomingTable
+  requiredStationType: BathTub
   description: 

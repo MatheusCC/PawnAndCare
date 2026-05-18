@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Service_Gromming
   m_EditorClassIdentifier: Assembly-CSharp::PawsAndCare.Services.ServiceDefinition
   serviceType: 0
-  baseDuration: 60
-  basePrice: 25
+  baseDuration: 90
+  basePrice: 40
   requiredStationType: GroomingTable
   description: 
