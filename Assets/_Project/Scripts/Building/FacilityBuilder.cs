@@ -91,7 +91,11 @@ namespace PawsAndCare.Building
             new StationPlaceholder("GroomingTable", new Vector2Int(12, 1), new Color(0.65f, 0.25f, 0.40f)),
         };
 
-        private void Start()
+        /// <summary>
+        /// Builds the placeholder facility: base floor, room floors, station cubes, then bakes the NavMesh.
+        /// Called by GameManager during boot so order vs. other systems (pet spawn) is deterministic.
+        /// </summary>
+        public void Build()
         {
             if (gridSystem != null)
             {

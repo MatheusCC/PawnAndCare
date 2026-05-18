@@ -147,6 +147,15 @@ namespace PawsAndCare.Input
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Click"",
+                    ""type"": ""Button"",
+                    ""id"": ""1c2e9b4a-7d6f-4e3a-9b1f-8c5d4e7a2b3c"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -303,6 +312,17 @@ namespace PawsAndCare.Input
                     ""action"": ""PointerPosition"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9d4e8c2b-3a5f-4b7c-8d9e-1f2a3b4c5d6e"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Click"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -317,6 +337,7 @@ namespace PawsAndCare.Input
             m_Camera_RotateRight = m_Camera.FindAction("RotateRight", throwIfNotFound: true);
             m_Camera_Drag = m_Camera.FindAction("Drag", throwIfNotFound: true);
             m_Camera_PointerPosition = m_Camera.FindAction("PointerPosition", throwIfNotFound: true);
+            m_Camera_Click = m_Camera.FindAction("Click", throwIfNotFound: true);
         }
 
         ~@CameraInputActions()
@@ -403,6 +424,7 @@ namespace PawsAndCare.Input
         private readonly InputAction m_Camera_RotateRight;
         private readonly InputAction m_Camera_Drag;
         private readonly InputAction m_Camera_PointerPosition;
+        private readonly InputAction m_Camera_Click;
         /// <summary>
         /// Provides access to input actions defined in input action map "Camera".
         /// </summary>
@@ -438,6 +460,10 @@ namespace PawsAndCare.Input
             /// Provides access to the underlying input action "Camera/PointerPosition".
             /// </summary>
             public InputAction @PointerPosition => m_Wrapper.m_Camera_PointerPosition;
+            /// <summary>
+            /// Provides access to the underlying input action "Camera/Click".
+            /// </summary>
+            public InputAction @Click => m_Wrapper.m_Camera_Click;
             /// <summary>
             /// Provides access to the underlying input action map instance.
             /// </summary>
@@ -482,6 +508,9 @@ namespace PawsAndCare.Input
                 @PointerPosition.started += instance.OnPointerPosition;
                 @PointerPosition.performed += instance.OnPointerPosition;
                 @PointerPosition.canceled += instance.OnPointerPosition;
+                @Click.started += instance.OnClick;
+                @Click.performed += instance.OnClick;
+                @Click.canceled += instance.OnClick;
             }
 
             /// <summary>
@@ -511,6 +540,9 @@ namespace PawsAndCare.Input
                 @PointerPosition.started -= instance.OnPointerPosition;
                 @PointerPosition.performed -= instance.OnPointerPosition;
                 @PointerPosition.canceled -= instance.OnPointerPosition;
+                @Click.started -= instance.OnClick;
+                @Click.performed -= instance.OnClick;
+                @Click.canceled -= instance.OnClick;
             }
 
             /// <summary>
@@ -593,6 +625,13 @@ namespace PawsAndCare.Input
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnPointerPosition(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "Click" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnClick(InputAction.CallbackContext context);
         }
     }
 }

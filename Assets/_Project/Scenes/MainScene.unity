@@ -220,6 +220,51 @@ Transform:
   - {fileID: 1399574015}
   m_Father: {fileID: 2007444613}
   m_LocalEulerAnglesHint: {x: 0, y: 45, z: 0}
+--- !u!1 &1018907118
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1018907120}
+  - component: {fileID: 1018907121}
+  m_Layer: 0
+  m_Name: AgentController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1018907120
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1018907118}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1018907121
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1018907118}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a96ceb2d03da1c9409e4e4c1fed7987d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PawsAndCare.Player.AgentController
+  mainCamera: {fileID: 1399574014}
 --- !u!1 &1023988946
 GameObject:
   m_ObjectHideFlags: 0
@@ -313,6 +358,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d53fa2280d5e5a42bc01a40208f4591, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PawsAndCare.Core.GameManager
+  facilityBuilder: {fileID: 476163019}
+  workerSpawner: {fileID: 2020094975}
 --- !u!4 &1335720087
 Transform:
   m_ObjectHideFlags: 0
@@ -652,6 +699,53 @@ MonoBehaviour:
   edgePanEnabled: 0
   edgePanMargin: 20
   edgePanSpeed: 10
+--- !u!1 &2020094972
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2020094974}
+  - component: {fileID: 2020094975}
+  m_Layer: 0
+  m_Name: WorkerSpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2020094974
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2020094972}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.56302, y: -0, z: 2.28604}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2020094975
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2020094972}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dfc02afffedcceb47b5e9efda230562a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PawsAndCare.Workers.WorkerSpawner
+  workerPrefab: {fileID: 5427138471708852059, guid: bf0d445ca3813464192682922a36a455,
+    type: 3}
+  spawnPosition: {x: 0, y: 0, z: 0}
 --- !u!1 &2023209467
 GameObject:
   m_ObjectHideFlags: 0
@@ -710,3 +804,5 @@ SceneRoots:
   - {fileID: 476163020}
   - {fileID: 2023209469}
   - {fileID: 2007444613}
+  - {fileID: 1018907120}
+  - {fileID: 2020094974}

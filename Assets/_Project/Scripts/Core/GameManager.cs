@@ -1,4 +1,6 @@
 using UnityEngine;
+using PawsAndCare.Building;
+using PawsAndCare.Workers;
 
 namespace PawsAndCare.Core
 {
@@ -11,31 +13,68 @@ namespace PawsAndCare.Core
     }
 
     /// <summary>
-    /// Central authority for the game's high-level state.
-    /// Owns the GameState lifecycle; ChangeState is the single mutation entry point.
+    /// Central authority for the game's high-level state and boot sequence.
+    /// Owns the GameState lifecycle and orchestrates ordered system startup.
     /// </summary>
     public class GameManager : Singleton<GameManager>
     {
-        private GameState initialState; 
+        [SerializeField]
+        private FacilityBuilder facilityBuilder = null;
+        [SerializeField]
+        private WorkerSpawner workerSpawner = null;
+
         private GameState currentState;
         private GameState previousState;
 
-        public GameState CurrentState 
-        { 
+        public GameState CurrentState
+        {
             get { return currentState; }
         }
 
-        public GameState PreviousState 
-        { 
+        public GameState PreviousState
+        {
             get { return previousState; }
         }
 
         protected override void OnInitialize()
         {
-            initialState = GameState.PLAYING;
+            // Boot starts in LOADING so any system listening for "game ready" only triggers
+            // after the LOADING → PLAYING transition fired at the end of BootGame().
+            currentState = GameState.LOADING;
+            previousState = GameState.LOADING;
+        }
 
-            currentState = initialState;
-            previousState = initialState;
+        private void Start()
+        {
+            // Start (not OnInitialize/Awake) so every other system's Awake has finished —
+            // GridSystem.Awake allocates cells, and FacilityBuilder needs those cells.
+            BootGame();
+        }
+
+        private void BootGame()
+        {
+            // Strict ordering: facility geometry + NavMesh must exist before any
+            // NavMeshAgent (pet, worker) spawns, otherwise agents land off-mesh and
+            // SetDestination silently does nothing.
+            if (facilityBuilder != null)
+            {
+                facilityBuilder.Build();
+            }
+            else
+            {
+                Debug.LogError("[GameManager] FacilityBuilder reference is missing — assign one in the inspector.", this);
+            }
+
+            if (workerSpawner != null)
+            {
+                workerSpawner.Spawn();
+            }
+            else
+            {
+                Debug.LogWarning("[GameManager] WorkerSpawner reference is missing — assign one in the inspector.", this);
+            }
+
+            ChangeState(GameState.PLAYING);
         }
 
         /// <summary>
