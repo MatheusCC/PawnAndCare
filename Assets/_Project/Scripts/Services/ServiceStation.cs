@@ -77,31 +77,38 @@ namespace PawsAndCare.Services
         {
             targetRenderer = GetComponent<MeshRenderer>();
 
-            if(targetRenderer != null)
+            if (targetRenderer != null)
             {
-                if (outlineMaterial != null)
-                {
-                    defaultMaterials = targetRenderer.sharedMaterials;
-
-                    highlightedMaterials = new Material[defaultMaterials.Length + 1];
-
-                    for (int i = 0; i < defaultMaterials.Length; i++)
-                    {
-                        highlightedMaterials[i] = defaultMaterials[i];
-                    }
-
-                    highlightedMaterials[defaultMaterials.Length] = outlineMaterial;
-                }   
-                else
-                {
-                    Debug.LogWarning("[ServiceStation] outlineMaterial is missing — hover highlight will not work. Assign it in the inspector.", this);
-                }         
+                BuildHighlightMaterials();
             }
             else
             {
                 Debug.LogWarning("[ServiceStation] No MeshRenderer found on this GameObject — hover highlight will not work.", this);
             }
+        }
 
+        // Snapshots the renderer's authored materials (defaultMaterials) and the same list with
+        // outlineMaterial appended (highlightedMaterials), so hover toggling is a single
+        // sharedMaterials assignment instead of per-frame array work.
+        private void BuildHighlightMaterials()
+        {
+            if (outlineMaterial != null)
+            {
+                defaultMaterials = targetRenderer.sharedMaterials;
+
+                highlightedMaterials = new Material[defaultMaterials.Length + 1];
+
+                for (int i = 0; i < defaultMaterials.Length; i++)
+                {
+                    highlightedMaterials[i] = defaultMaterials[i];
+                }
+
+                highlightedMaterials[defaultMaterials.Length] = outlineMaterial;
+            }
+            else
+            {
+                Debug.LogWarning("[ServiceStation] outlineMaterial is missing — hover highlight will not work. Assign it in the inspector.", this);
+            }
         }
 
         // Start (not Awake): StationManager is a Singleton initialised in its own Awake. Using Start
@@ -109,6 +116,11 @@ namespace PawsAndCare.Services
         // regardless of which order Unity wakes the GameObjects.
         private void Start()
         {
+            if (workerAnchor == null)
+            {
+                Debug.LogWarning("[ServiceStation] workerAnchor is missing — Workers will have no stand position. Assign one in the inspector.", this);
+            }
+
             if (serviceData != null)
             {
                 if (StationManager.Instance != null)

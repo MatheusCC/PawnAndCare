@@ -65,11 +65,11 @@ namespace PawsAndCare.Core
                 // during dispatch doesn't trigger "Collection modified" exceptions.
                 Delegate[] snapshot = list.ToArray();
 
-                foreach (Delegate del in snapshot)
+                for (int i = 0; i < snapshot.Length; i++)
                 {
                     // Safe cast: only handlers added through Subscribe<T> end up
                     // in this drawer, so they're all Action<T>.
-                    Action<T> typedHandler = (Action<T>)del;
+                    Action<T> typedHandler = (Action<T>)snapshot[i];
 
                     try
                     {

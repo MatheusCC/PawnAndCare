@@ -15,9 +15,15 @@ namespace PawsAndCare.Interaction
         [SerializeField]
         private UnityEngine.Camera mainCamera = null;
 
-        private CameraInputActions input = null;
-        private InteractionMode currentMode = InteractionMode.NORMAL;
-        private IInteractable hoveredInteractable = null;
+        private CameraInputActions input;
+        private InteractionMode currentMode;
+        private IInteractable hoveredInteractable;
+
+        // Cache the last raycast-hit collider and the IInteractable it resolved to. While the
+        // pointer stays over the same collider, this avoids re-walking the hierarchy with
+        // GetComponentInParent every frame — the lookup only runs when the hit collider changes.
+        private Collider lastHitCollider;
+        private IInteractable lastHitInteractable;
 
         /// <summary>
         /// The current interaction mode. Controls whether hover/click routing to IInteractable is allowed.
@@ -92,7 +98,7 @@ namespace PawsAndCare.Interaction
 
                 if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity))
                 {
-                    IInteractable interactable = hit.collider.GetComponentInParent<IInteractable>();
+                    IInteractable interactable = ResolveInteractable(hit.collider);
 
                     if (interactable != null && interactable.CanInteract())
                     {
@@ -102,6 +108,19 @@ namespace PawsAndCare.Interaction
             }
 
             return result;
+        }
+
+        // Resolve the IInteractable for a hit collider, reusing the cached result while the
+        // pointer stays over the same collider so GetComponentInParent only runs on change.
+        private IInteractable ResolveInteractable(Collider hitCollider)
+        {
+            if (hitCollider != lastHitCollider)
+            {
+                lastHitCollider = hitCollider;
+                lastHitInteractable = hitCollider.GetComponentInParent<IInteractable>();
+            }
+
+            return lastHitInteractable;
         }
 
         private void OnClick(InputAction.CallbackContext context)

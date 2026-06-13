@@ -73,6 +73,12 @@ namespace PawsAndCare.Camera
         public Transform CameraPivot { get { return cameraPivot; } }
         public UnityEngine.Camera MainCamera { get { return mainCamera; } }
 
+        // Input below this magnitude/value is treated as no input (a small deadzone that
+        // ignores float noise on the analog/scroll axes).
+        private const float INPUT_DEADZONE = 0.0001f;
+        // Degrees rotated per Q/E press.
+        private const float ROTATION_STEP_DEGREES = 90.0f;
+
         // The generated Input System wrapper class (from IA_CameraInput.inputactions).
         private CameraInputActions input;
 
@@ -141,10 +147,33 @@ namespace PawsAndCare.Camera
             // Seed targets to current values so the first frame's SmoothDamp has
             // nothing to ease toward (no startup jolt). Start runs after all Awakes,
             // so inspector references and the GridSystem grid are guaranteed ready.
-            targetRigPosition = cameraRig.position;
-            targetZoom = mainCamera.orthographicSize;
-            currentYRotation = cameraPivot.localEulerAngles.y;
-            targetYRotation = currentYRotation;
+            if (cameraRig != null)
+            {
+                targetRigPosition = cameraRig.position;
+            }
+            else
+            {
+                Debug.LogError("[IsometricCameraController] cameraRig reference is missing — assign one in the inspector.", this);
+            }
+
+            if (mainCamera != null)
+            {
+                targetZoom = mainCamera.orthographicSize;
+            }
+            else
+            {
+                Debug.LogError("[IsometricCameraController] mainCamera reference is missing — assign one in the inspector.", this);
+            }
+
+            if (cameraPivot != null)
+            {
+                currentYRotation = cameraPivot.localEulerAngles.y;
+                targetYRotation = currentYRotation;
+            }
+            else
+            {
+                Debug.LogError("[IsometricCameraController] cameraPivot reference is missing — assign one in the inspector.", this);
+            }
 
             ComputePanBounds();
         }
@@ -187,7 +216,7 @@ namespace PawsAndCare.Camera
         {
             Vector2 panInput = input.Camera.Pan.ReadValue<Vector2>();
 
-            if (panInput.sqrMagnitude > 0.0001f)
+            if (panInput.sqrMagnitude > INPUT_DEADZONE)
             {
                 // Build a local-space direction. Input.x = right/left, input.y = forward/back.
                 Vector3 localDirection = new Vector3(panInput.x, 0.0f, panInput.y);
@@ -215,7 +244,7 @@ namespace PawsAndCare.Camera
                 Vector2 screenDelta = pointerPos - lastPointerPosition;
                 lastPointerPosition = pointerPos;
 
-                if (screenDelta.sqrMagnitude > 0.0001f)
+                if (screenDelta.sqrMagnitude > INPUT_DEADZONE)
                 {
                     // For an orthographic camera, the full vertical world height is
                     // (2 * orthographicSize). Divide by screen height to get world
@@ -245,63 +274,80 @@ namespace PawsAndCare.Camera
                 // (Screen.width, Screen.height) at top-right.
                 Vector2 pointerPos = input.Camera.PointerPosition.ReadValue<Vector2>();
 
-                // Sanity gate: only edge-pan when the cursor actually sits inside the
-                // game window. Without this, an alt-tabbed user could return to find
-                // the camera has panned far away — the OS often reports the cursor
-                // sitting beyond the screen rect when focus is elsewhere.
-                bool cursorOnScreen =
-                    pointerPos.x >= 0.0f
-                    && pointerPos.x <= Screen.width
-                    && pointerPos.y >= 0.0f
-                    && pointerPos.y <= Screen.height;
-
-                if (cursorOnScreen)
+                if (IsCursorOnScreen(pointerPos))
                 {
-                    // Build a Vector2 of -1/0/1 values representing which edge(s) the
-                    // cursor is hugging. Same shape as the WASD Pan action so we can
-                    // feed it straight into the camera-relative direction math below.
-                    Vector2 edgeInput = Vector2.zero;
-
-                    // X axis: cursor near left edge → pan left (-1). Right edge → +1.
-                    if (pointerPos.x <= edgePanMargin)
-                    {
-                        edgeInput.x = -1.0f;
-                    }
-                    else if (pointerPos.x >= Screen.width - edgePanMargin)
-                    {
-                        edgeInput.x = 1.0f;
-                    }
-
-                    // Y axis: cursor near bottom edge → pan -Z. Top edge → +Z.
-                    // Screen Y maps to world Z because we're looking down at the XZ plane.
-                    if (pointerPos.y <= edgePanMargin)
-                    {
-                        edgeInput.y = -1.0f;
-                    }
-                    else if (pointerPos.y >= Screen.height - edgePanMargin)
-                    {
-                        edgeInput.y = 1.0f;
-                    }
+                    Vector2 edgeInput = GetEdgePanDirection(pointerPos);
 
                     // sqrMagnitude > 0 means at least one axis hit an edge. In a corner
                     // both are non-zero — a diagonal pan, which falls out automatically
-                    // because each axis is handled independently. No normalisation
-                    // needed; diagonal being slightly faster than straight feels natural.
-                    if (edgeInput.sqrMagnitude > 0.0001f)
+                    // because each axis is handled independently.
+                    if (edgeInput.sqrMagnitude > INPUT_DEADZONE)
                     {
-                        // Same camera-relative pattern as HandleKeyboardPan:
-                        //   1. Treat input as a local-space direction (x = right, z = forward).
-                        //   2. Rotate by the pivot's TARGET Y rotation so direction follows
-                        //      the current view, not the world axes.
-                        //   3. Scale by zoom so pan speed stays perceptually consistent.
-                        Vector3 localDirection = new Vector3(edgeInput.x, 0.0f, edgeInput.y);
-                        Quaternion pivotRotation = Quaternion.Euler(0.0f, targetYRotation, 0.0f);
-                        Vector3 worldDirection = pivotRotation * localDirection;
-                        float zoomScale = mainCamera.orthographicSize / panZoomScalingRef;
-                        targetRigPosition += worldDirection * edgePanSpeed * zoomScale * Time.deltaTime;
+                        ApplyEdgePan(edgeInput);
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// True when the cursor sits inside the game window. Guards against an alt-tabbed
+        /// user returning to a camera that drifted while the OS reported an off-screen cursor.
+        /// </summary>
+        private bool IsCursorOnScreen(Vector2 pointerPos)
+        {
+            return pointerPos.x >= 0.0f
+                && pointerPos.x <= Screen.width
+                && pointerPos.y >= 0.0f
+                && pointerPos.y <= Screen.height;
+        }
+
+        /// <summary>
+        /// Returns a -1/0/1 per-axis vector marking which edge(s) the cursor is hugging.
+        /// Same shape as the WASD Pan action so it feeds straight into the pan math.
+        /// </summary>
+        private Vector2 GetEdgePanDirection(Vector2 pointerPos)
+        {
+            Vector2 edgeInput = Vector2.zero;
+
+            // X axis: cursor near left edge → pan left (-1). Right edge → +1.
+            if (pointerPos.x <= edgePanMargin)
+            {
+                edgeInput.x = -1.0f;
+            }
+            else if (pointerPos.x >= Screen.width - edgePanMargin)
+            {
+                edgeInput.x = 1.0f;
+            }
+
+            // Y axis: cursor near bottom edge → pan -Z. Top edge → +Z.
+            // Screen Y maps to world Z because we're looking down at the XZ plane.
+            if (pointerPos.y <= edgePanMargin)
+            {
+                edgeInput.y = -1.0f;
+            }
+            else if (pointerPos.y >= Screen.height - edgePanMargin)
+            {
+                edgeInput.y = 1.0f;
+            }
+
+            return edgeInput;
+        }
+
+        /// <summary>
+        /// Adds a camera-relative, zoom-scaled edge-pan delta to the target rig position.
+        /// </summary>
+        private void ApplyEdgePan(Vector2 edgeInput)
+        {
+            // Same camera-relative pattern as HandleKeyboardPan:
+            //   1. Treat input as a local-space direction (x = right, z = forward).
+            //   2. Rotate by the pivot's TARGET Y rotation so direction follows
+            //      the current view, not the world axes.
+            //   3. Scale by zoom so pan speed stays perceptually consistent.
+            Vector3 localDirection = new Vector3(edgeInput.x, 0.0f, edgeInput.y);
+            Quaternion pivotRotation = Quaternion.Euler(0.0f, targetYRotation, 0.0f);
+            Vector3 worldDirection = pivotRotation * localDirection;
+            float zoomScale = mainCamera.orthographicSize / panZoomScalingRef;
+            targetRigPosition += worldDirection * edgePanSpeed * zoomScale * Time.deltaTime;
         }
 
         /// <summary>
@@ -311,7 +357,7 @@ namespace PawsAndCare.Camera
         {
             float scrollInput = input.Camera.Zoom.ReadValue<float>();
 
-            if (Mathf.Abs(scrollInput) > 0.0001f)
+            if (Mathf.Abs(scrollInput) > INPUT_DEADZONE)
             {
                 // Subtraction inverts the sign: scrolling UP (positive) → zooms IN
                 // (smaller ortho size). Clamping keeps zoom in a sensible range.
@@ -363,7 +409,7 @@ namespace PawsAndCare.Camera
         {
             // Q rotates the WORLD left. Camera spins clockwise around Y (+90°),
             // which from the player's view makes the world appear to swing left.
-            targetYRotation += 90.0f;
+            targetYRotation += ROTATION_STEP_DEGREES;
         }
 
         /// <summary>
@@ -371,7 +417,7 @@ namespace PawsAndCare.Camera
         /// </summary>
         private void OnRotateRight(InputAction.CallbackContext ctx)
         {
-            targetYRotation -= 90.0f;
+            targetYRotation -= ROTATION_STEP_DEGREES;
         }
 
         /// <summary>

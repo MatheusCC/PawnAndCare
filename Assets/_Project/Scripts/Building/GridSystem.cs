@@ -21,6 +21,9 @@ namespace PawsAndCare.Building
         [SerializeField]
         private Color unwalkableGizmoColor = new Color(0.18f, 0.20f, 0.21f, 0.4f);
 
+        private const float GIZMO_OVERLAY_SCALE = 0.9f;
+        private const float GIZMO_OVERLAY_HEIGHT = 0.05f;
+
         private GridCell[,] cells;
         private readonly List<Room> rooms = new List<Room>();
         private int nextRoomId = 1;
@@ -112,8 +115,9 @@ namespace PawsAndCare.Building
             Room room = new Room(nextRoomId, type);
             nextRoomId++;
 
-            foreach (Vector2Int cellPos in cellsToAssign)
+            for (int i = 0; i < cellsToAssign.Count; i++)
             {
+                Vector2Int cellPos = cellsToAssign[i];
                 GridCell cell = GetCell(cellPos);
 
                 if (cell != null)
@@ -145,11 +149,11 @@ namespace PawsAndCare.Building
         {
             Room result = null;
 
-            foreach (Room room in rooms)
+            for (int i = 0; i < rooms.Count; i++)
             {
-                if (room.RoomId == id)
+                if (rooms[i].RoomId == id)
                 {
-                    result = room;
+                    result = rooms[i];
                 }
             }
 
@@ -192,7 +196,7 @@ namespace PawsAndCare.Building
             {
                 // Overlay is a flat tile, 90% of cell width to leave a small gap that
                 // makes the underlying gridlines still visible at cell boundaries.
-                Vector3 overlaySize = new Vector3(cellSize * 0.9f, 0.05f, cellSize * 0.9f);
+                Vector3 overlaySize = new Vector3(cellSize * GIZMO_OVERLAY_SCALE, GIZMO_OVERLAY_HEIGHT, cellSize * GIZMO_OVERLAY_SCALE);
 
                 for (int x = 0; x < width; x++)
                 {
