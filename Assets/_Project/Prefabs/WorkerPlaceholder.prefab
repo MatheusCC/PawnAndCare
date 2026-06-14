@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 8694929938007348210}
   - component: {fileID: 4752937263029992176}
   - component: {fileID: 883962416329605782}
+  - component: {fileID: -3804394233132621518}
   m_Layer: 0
   m_Name: WorkerPlaceholder
   m_TagString: Untagged
@@ -152,6 +153,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PawsAndCare.Workers.Worker
   selectionIndicator: {fileID: 8187007111376779349}
+  workerData: {fileID: 11400000, guid: 9d6d41121a5993848808e4d69db0bfe5, type: 2}
+--- !u!114 &-3804394233132621518
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5427138471708852059}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0663ebc8de3c5a449c9d556481cff2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PawsAndCare.Workers.WorkerServiceRunner
 --- !u!1 &8187007111376779349
 GameObject:
   m_ObjectHideFlags: 0

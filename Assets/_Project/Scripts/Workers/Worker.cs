@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
+using PawsAndCare.Services;
 
 namespace PawsAndCare.Workers
 {
@@ -13,15 +14,43 @@ namespace PawsAndCare.Workers
         [Tooltip("Visual shown under the worker when selected by the player. Disabled by default.")]
         private GameObject selectionIndicator = null;
 
+        [SerializeField]
+        [Tooltip("Defines this worker's role, move speed, and per-service skill ratings.")]
+        private WorkerData workerData = null;
+
         private NavMeshAgent navMeshAgent = null;
 
         private void Awake()
         {
             navMeshAgent = GetComponent<NavMeshAgent>();
 
+            if (workerData != null)
+            {
+                navMeshAgent.speed = workerData.BaseMoveSpeed;
+            }
+            else
+            {
+                Debug.LogWarning("[Worker] workerData is missing — using prefab default speed and zero skill ratings. Assign one in the inspector.", this);
+            }
+
             // Force the indicator off at boot so prefab-authoring mistakes (left enabled in editor)
             // don't produce a "selected" worker on spawn.
             SetSelectionIndicatorActive(false);
+        }
+
+        /// <summary>
+        /// Returns this worker's skill rating [0,1] for the given service type, or 0 if no data is assigned.
+        /// </summary>
+        public float GetSkillRating(ServiceType serviceType)
+        {
+            float rating = 0.0f;
+
+            if (workerData != null)
+            {
+                rating = workerData.GetSkillRating(serviceType);
+            }
+
+            return rating;
         }
 
         /// <summary>
@@ -35,7 +64,7 @@ namespace PawsAndCare.Workers
             }
             else
             {
-                Debug.LogWarning("[Worker] Missing selection indicator reference!!", this);
+                Debug.LogWarning("[Worker] selectionIndicator is missing — assign one in the inspector.", this);
             }
         }
 

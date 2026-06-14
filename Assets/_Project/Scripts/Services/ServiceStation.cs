@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.UI;
+using PawsAndCare.Core;
 using PawsAndCare.Interaction;
 
 namespace PawsAndCare.Services
@@ -35,6 +37,14 @@ namespace PawsAndCare.Services
         [Tooltip("Outline material applied as an additional sub-material on hover. Cleared on hover exit.")]
         private Material outlineMaterial = null;
 
+        [SerializeField]
+        [Tooltip("Optional. Root object of the world-space service progress bar (e.g. the Canvas). Toggled with the service.")]
+        private GameObject progressBarRoot = null;
+
+        [SerializeField]
+        [Tooltip("Optional. Filled Image whose fillAmount goes 0 (empty) to 1 (full) as the service progresses. Set its Image Type to Filled.")]
+        private Image progressFill = null;
+
         private MeshRenderer targetRenderer = null;
 
         // Two cached material arrays so hover/exit just swaps a reference instead of allocating each time.
@@ -42,8 +52,6 @@ namespace PawsAndCare.Services
         // highlightedMaterials = defaultMaterials with outlineMaterial appended at the end.
         private Material[] defaultMaterials = null;
         private Material[] highlightedMaterials = null;
-
-        // TODO Task 12: add `private ServiceSession currentSession = null;` once ServiceSession exists.
 
         public ServiceData Data
         {
@@ -166,6 +174,42 @@ namespace PawsAndCare.Services
             return !isOccupied && serviceData != null;
         }
 
+        /// <summary>
+        /// Sets occupancy. Owned by WorkerServiceRunner: reserved (true) when a worker is dispatched
+        /// here, released (false) on cancellation or service completion. Drives CanInteract/availability.
+        /// </summary>
+        public void SetOccupied(bool occupied)
+        {
+            isOccupied = occupied;
+        }
+
+        /// <summary>
+        /// Shows the progress bar (if assigned) and sets its fill to the given normalized value.
+        /// </summary>
+        public void ShowServiceProgress(float normalized)
+        {
+            if (progressBarRoot != null)
+            {
+                progressBarRoot.SetActive(true);
+            }
+
+            if (progressFill != null)
+            {
+                progressFill.fillAmount = Mathf.Clamp01(normalized);
+            }
+        }
+
+        /// <summary>
+        /// Hides the progress bar (if assigned).
+        /// </summary>
+        public void HideServiceProgress()
+        {
+            if (progressBarRoot != null)
+            {
+                progressBarRoot.SetActive(false);
+            }
+        }
+
         public void OnHoverEnter()
         {
             if (targetRenderer != null && highlightedMaterials != null)
@@ -182,8 +226,11 @@ namespace PawsAndCare.Services
             }
         }
 
+        // Reachable only when CanInteract() is true (the interaction layer gates it), so a selected
+        // station is always a valid service target. Broadcast it; player-control systems decide what to do.
         public void OnSelect()
         {
+            EventBus.Publish(new StationSelectedEvent(this));
         }
 
         public void OnDeselect()

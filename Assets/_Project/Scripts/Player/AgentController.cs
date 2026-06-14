@@ -1,21 +1,27 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using PawsAndCare.Core;
 using PawsAndCare.Input;
+using PawsAndCare.Interaction;
+using PawsAndCare.Services;
 using PawsAndCare.Workers;
 
 namespace PawsAndCare.Player
 {
     /// <summary>
-    /// Scene-level player input router. Left-click on a Worker selects it; left-click elsewhere
-    /// commands the currently selected Worker to move to the hit point.
+    /// Scene-level player input router. Left-click on a Worker selects it; left-click on the floor
+    /// commands the selected Worker to move there. Station clicks are owned by the interaction layer
+    /// and reach this router as a StationSelectedEvent, which dispatches the worker to that station.
+    /// All worker behavior runs through WorkerServiceRunner — this class only routes intent.
     /// </summary>
     public class AgentController : MonoBehaviour
     {
         [SerializeField]
         private UnityEngine.Camera mainCamera = null;
 
-        private CameraInputActions input = null;
-        private Worker selectedWorker = null;
+        private CameraInputActions input;
+        private Worker selectedWorker;
+        private WorkerServiceRunner selectedRunner;
 
         private void Awake()
         {
@@ -23,6 +29,7 @@ namespace PawsAndCare.Player
             // Click fires once on press (Button type), matching the "issue an order" gesture.
             input = new CameraInputActions();
             input.Camera.Click.performed += OnClick;
+            EventBus.Subscribe<StationSelectedEvent>(OnStationSelected);
         }
 
         private void OnEnable()
@@ -41,6 +48,7 @@ namespace PawsAndCare.Player
             // with domain reload disabled leaks subscriptions across sessions.
             input.Camera.Click.performed -= OnClick;
             input.Dispose();
+            EventBus.Unsubscribe<StationSelectedEvent>(OnStationSelected);
         }
 
         private void OnClick(InputAction.CallbackContext context)
@@ -69,26 +77,47 @@ namespace PawsAndCare.Player
 
                 if (clickedWorker != null)
                 {
-                    // Click landed on a Worker → make it the controlled agent.
-                    // Clear the previous selection's indicator first; the new one gets its own indicator.
-                    // Skip the toggle when clicking the already-selected worker (no-op selection).
-                    if (selectedWorker != clickedWorker)
-                    {
-                        if (selectedWorker != null)
-                        {
-                            selectedWorker.SetSelectionIndicatorActive(false);
-                        }
-
-                        selectedWorker = clickedWorker;
-                        selectedWorker.SetSelectionIndicatorActive(true);
-                    }
+                    SelectWorker(clickedWorker);
                 }
-                else if (selectedWorker != null)
+                else if (hit.collider.GetComponentInParent<IInteractable>() == null && selectedRunner != null)
                 {
-                    // Click landed on the ground (or anything non-Worker) with a Worker
-                    // already selected → route the click as a move command.
-                    selectedWorker.MoveTo(hit.point);
+                    // Floor (non-interactable) click with a worker selected → move order.
+                    // Interactable clicks (stations) are owned by the interaction layer via
+                    // StationSelectedEvent, so they must not also trigger a raw move here.
+                    selectedRunner.RequestMove(hit.point);
                 }
+            }
+        }
+
+        // Selection caches the worker and its service runner once, so per-click routing never
+        // re-runs GetComponent. Re-selecting the already-selected worker is a no-op.
+        private void SelectWorker(Worker worker)
+        {
+            if (selectedWorker != worker)
+            {
+                if (selectedWorker != null)
+                {
+                    selectedWorker.SetSelectionIndicatorActive(false);
+                }
+
+                selectedWorker = worker;
+                selectedRunner = worker.GetComponent<WorkerServiceRunner>();
+                selectedWorker.SetSelectionIndicatorActive(true);
+
+                if (selectedRunner == null)
+                {
+                    Debug.LogError("[AgentController] Selected worker has no WorkerServiceRunner — it cannot perform services.", this);
+                }
+            }
+        }
+
+        // A station was selected through the interaction layer. If a worker is selected,
+        // dispatch it to walk to that station and perform its service.
+        private void OnStationSelected(StationSelectedEvent eventData)
+        {
+            if (selectedRunner != null)
+            {
+                selectedRunner.AssignStation(eventData.Station);
             }
         }
     }
