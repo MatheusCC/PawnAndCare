@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 204d1dbb64be5d046b39bfc97e5d520e, type: 3}
+  m_Name: Pet_Cat_Grooming
+  m_EditorClassIdentifier: Assembly-CSharp::PawsAndCare.Pets.PetDefinition
+  species: 0
+  size: 1
+  temperament: 0
+  desiredService: 1
+  patience: 30
+  visualPrefab: {fileID: 0}
