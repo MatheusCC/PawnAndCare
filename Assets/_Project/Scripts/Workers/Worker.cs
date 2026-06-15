@@ -18,7 +18,7 @@ namespace PawsAndCare.Workers
         [Tooltip("Defines this worker's role, move speed, and per-service skill ratings.")]
         private WorkerData workerData = null;
 
-        private NavMeshAgent navMeshAgent = null;
+        private NavMeshAgent navMeshAgent;
 
         private void Awake()
         {

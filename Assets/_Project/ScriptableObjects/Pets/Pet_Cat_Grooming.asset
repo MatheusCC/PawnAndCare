@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 204d1dbb64be5d046b39bfc97e5d520e, type: 3}
   m_Name: Pet_Cat_Grooming
   m_EditorClassIdentifier: Assembly-CSharp::PawsAndCare.Pets.PetDefinition
-  species: 0
+  species: 1
   size: 1
-  temperament: 0
-  desiredService: 1
-  patience: 30
+  temperament: 1
+  desiredService: 0
+  patience: 15
   visualPrefab: {fileID: 0}
