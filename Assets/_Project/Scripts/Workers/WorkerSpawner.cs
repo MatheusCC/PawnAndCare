@@ -10,7 +10,7 @@ namespace PawsAndCare.Workers
         [SerializeField]
         private GameObject workerPrefab = null;
         [SerializeField]
-        private Vector3 spawnPosition = Vector3.zero;
+        private Transform spawnPosition = null;
 
         /// <summary>
         /// Instantiates the worker prefab at the configured spawn position.
@@ -20,7 +20,7 @@ namespace PawsAndCare.Workers
         {
             if (workerPrefab != null)
             {
-                Instantiate(workerPrefab, spawnPosition, Quaternion.identity, transform);
+                Instantiate(workerPrefab, spawnPosition.position, Quaternion.identity, transform);
             }
             else
             {
