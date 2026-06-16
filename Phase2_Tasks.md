@@ -23,65 +23,67 @@ Systems already in place that Phase 2 builds on:
 
 ---
 
-## Task 1 — Pet Data Foundations `[TODO]`
+## Task 1 — Pet Data Foundations `[DONE]`
 
 Mirrors the existing `WorkerData`/`ServiceData` SO pattern.
 
 ### 1A — Enums
-- [ ] 1A.1 `PetSpecies` enum (start small: `DOG`, `CAT`; UPPER_SNAKE per convention, new items appended only)
-- [ ] 1A.2 `PetSize` enum (`SMALL`, `MEDIUM`, `LARGE`) — drives NavMesh agent radius + station fit later
-- [ ] 1A.3 `Temperament` enum (`CALM`, `ANXIOUS`, `AGGRESSIVE`) — behavioral effects deferred; data only for now
+- [x] 1A.1 `PetSpecies` enum (start small: `DOG`, `CAT`; UPPER_SNAKE per convention, new items appended only)
+- [x] 1A.2 `PetSize` enum (`SMALL`, `MEDIUM`, `LARGE`) — drives NavMesh agent radius + station fit later
+- [x] 1A.3 `Temperament` enum (`CALM`, `ANXIOUS`, `AGGRESSIVE`) — behavioral effects deferred; data only for now
 
 ### 1B — PetDefinition ScriptableObject
-- [ ] 1B.1 `PetDefinition : ScriptableObject` in `Scripts/Pets/`: species, size, temperament, desired `ServiceType`, patience (seconds before leaving unhappy), visual prefab/material ref
-- [ ] 1B.2 `[CreateAssetMenu]` attribute (menu: `PawsAndCare/Pets/Pet Definition`)
-- [ ] 1B.3 Create asset: "Pet_Dog_Bathing" — wants Bathing, medium patience
-- [ ] 1B.4 Create asset: "Pet_Cat_Grooming" — wants Grooming, lower patience
+- [x] 1B.1 `PetDefinition : ScriptableObject` in `Scripts/Pets/`: species, size, temperament, desired `ServiceType`, patience (seconds before leaving unhappy), visual prefab/material ref
+- [x] 1B.2 `[CreateAssetMenu]` attribute (menu: `PawsAndCare/Pets/Pet Definition`)
+- [x] 1B.3 Create asset: "Pet_Dog_Bathing" — wants Bathing, medium patience
+- [x] 1B.4 Create asset: "Pet_Cat_Grooming" — wants Grooming, lower patience
 
 ---
 
-## Task 2 — Pet Entity & State Machine `[TODO]`
+## Task 2 — Pet Entity & State Machine `[DONE]`
 
 ### 2A — Pet Component
-- [ ] 2A.1 `Pet : MonoBehaviour` in `Scripts/Pets/` — NavMeshAgent wrapper mirroring `Worker` (`MoveTo`, `HasReachedDestination`)
-- [ ] 2A.2 `[RequireComponent(typeof(NavMeshAgent))]`; hold a `PetDefinition` reference
-- [ ] 2A.3 Expose desired `ServiceType` (from definition) for the dispatcher to match against
+- [x] 2A.1 `Pet : MonoBehaviour` in `Scripts/Pets/` — NavMeshAgent wrapper mirroring `Worker` (`MoveTo`, `HasReachedDestination`)
+- [x] 2A.2 `[RequireComponent(typeof(NavMeshAgent))]`; hold a `PetDefinition` reference
+- [x] 2A.3 Expose desired `ServiceType` (from definition) for the dispatcher to match against — via `GetDesiredService()`
 
 ### 2B — Pet State Machine (autonomous brain)
-- [ ] 2B.1 `PetStateMachine` (or `PetBrain`) component beside `Pet` — composition, like `WorkerServiceRunner`. **Not** routed through `AgentController` (pets are AI, not player-controlled)
-- [ ] 2B.2 `PetState` enum: `ARRIVING`, `QUEUING`, `MOVING_TO_STATION`, `BEING_SERVICED`, `LEAVING`, `DESPAWNING`
-- [ ] 2B.3 State transitions: Arriving → reaches reception → Queuing; dispatcher assigns → MovingToStation; arrives → BeingServiced; session completes → Leaving; reaches exit → Despawning
-- [ ] 2B.4 Patience timer during Queuing: on timeout → Leaving (unhappy) — reputation hook for later
+- [x] 2B.1 `PetStateMachine` component beside `Pet` — composition, like `WorkerServiceRunner`. **Not** routed through `AgentController` (pets are AI, not player-controlled)
+- [x] 2B.2 `PetState` enum: `ARRIVING`, `QUEUING`, `MOVING_TO_STATION`, `BEING_SERVICED`, `LEAVING`, `DESPAWNING`
+- [x] 2B.3 State transitions: Arriving → reaches reception → Queuing; dispatcher assigns → MovingToStation; arrives → BeingServiced; session completes → Leaving; reaches exit → Despawning
+- [x] 2B.4 Patience timer during Queuing: on timeout → Leaving (unhappy) — reputation hook for later
 
 ### 2C — Pet Prefab
-- [ ] 2C.1 Build pet prefab: visual + Collider + NavMeshAgent + `Pet` + `PetStateMachine`
+- [x] 2C.1 Build pet prefab: visual + Collider + NavMeshAgent + `Pet` + `PetStateMachine`
 
 ---
 
-## Task 3 — Spawning & Exit `[TODO]`
+## Task 3 — Spawning & Exit `[DONE]`
 
 ### 3A — Spawn/Exit Points
-- [ ] 3A.1 Scene-authored entrance Transform (spawn) and exit Transform (despawn target)
-- [ ] 3A.2 Both on the NavMesh so pets path in/out
+- [x] 3A.1 Scene-authored entrance Transform (spawn) and exit Transform (despawn target) — plus a reception Transform placeholder until Task 4
+- [x] 3A.2 Both on the NavMesh so pets path in/out
 
 ### 3B — Customer Spawner
-- [ ] 3B.1 `CustomerSpawner : MonoBehaviour` — instantiates pets from a pool of `PetDefinition`s
-- [ ] 3B.2 **Timer-based pacing for now** (random interval within min/max). Day-phase gating wired in when DayManager lands (Task 8)
-- [ ] 3B.3 Started by `GameManager.BootGame()` (after NavMesh exists) or self-gated on PLAYING state
-- [ ] 3B.4 Despawn lifecycle: pet returns to exit, then `Destroy` (Object Pooling deferred to polish)
+- [x] 3B.1 `CustomerSpawner : MonoBehaviour` in `Scripts/Pets/` — instantiates from a pool of pet **prefabs** (each carries its own `PetDefinition`, avoiding a runtime setter on `Pet`)
+- [x] 3B.2 **Timer-based pacing for now** (random interval via `min/maxSpawnInterval`). Day-phase gating wired in when DayManager lands (Task 8)
+- [x] 3B.3 Started by `GameManager.BootGame()` after the facility/NavMesh exist; spawner is `enabled = false` until `StartSpawning()`, which validates setup first
+- [x] 3B.4 Despawn lifecycle: handled by `PetStateMachine.BeginLeaving()` (walk to exit → `Destroy` on arrival). Object Pooling deferred to polish
 
 ---
 
-## Task 4 — Reception Queue `[TODO]`
+## Task 4 — Reception Queue `[DONE]`
 
 ### 4A — Queue Structure
-- [ ] 4A.1 `ReceptionQueue : Singleton<ReceptionQueue>` (or scene component) tracking ordered waiting pets
-- [ ] 4A.2 Physical queue slot Transforms; pet walks to its assigned slot on enqueue
-- [ ] 4A.3 Advance slots forward as pets are dequeued (pulled into service or leave on timeout)
-- [ ] 4A.4 `PeekNextForService(ServiceType)` / front-of-queue access for the dispatcher
+- [x] 4A.1 `ReceptionQueue : Singleton<ReceptionQueue>` in `Scripts/Services/`, tracking ordered waiting pets
+- [x] 4A.2 Physical queue slot Transforms (`queueSlots`); pet walks to its assigned slot on enqueue via `TryEnqueue` → `SendToQueueSlot`
+- [x] 4A.3 Advance slots forward as pets are removed — `Remove(pet, reason)` shifts the rest via `MoveToQueueSlot`. Used by both the patience timeout and the dispatcher (Task 5)
+- [x] 4A.4 `PeekNextForService(ServiceType)` — front-to-back scan returning the earliest-arrived pet wanting that service (per-service FIFO, no head-of-line blocking)
 
 ### 4B — Queue Events
-- [ ] 4B.1 Publish `PetEnqueuedEvent` / `PetLeftQueueEvent` (reputation + future UI consume these)
+- [x] 4B.1 Publish `PetEnqueuedEvent` (+ slot index) / `PetLeftQueueEvent` (+ `QueueLeaveReason`: `DISPATCHED` / `ABANDONED`, so Task 9 reputation can tell a serviced pet from a timeout)
+
+**Design note:** patience moved out of `PetStateMachine` into `ReceptionQueue` (`Update` loop ticks each waiting pet's timer). Keeps the pet primitive-driven and decoupled from queue/dispatcher types, and makes `QUEUING` a passive (Update-off) state. `CustomerSpawner` now enqueues on spawn and turns pets away to the exit when the queue is full.
 
 ---
 

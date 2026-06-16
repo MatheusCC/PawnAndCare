@@ -50,13 +50,11 @@ namespace PawsAndCare.Services
 
             for (int i = 0; i < registeredStations.Count; i++)
             {
-                if (result == null)
+                ServiceStation candidate = registeredStations[i];
+                if (!candidate.IsOccupied && candidate.Supports(type))
                 {
-                    ServiceStation candidate = registeredStations[i];
-                    if (!candidate.IsOccupied && candidate.Supports(type))
-                    {
-                        result = candidate;
-                    }
+                    result = candidate;
+                    break;
                 }
             }
 

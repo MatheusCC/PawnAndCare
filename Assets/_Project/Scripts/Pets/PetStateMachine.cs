@@ -1,4 +1,5 @@
 using UnityEngine;
+using PawsAndCare.Services;
 
 namespace PawsAndCare.Pets
 {
@@ -7,28 +8,39 @@ namespace PawsAndCare.Pets
     /// BeingServiced → Leaving → Despawning. Pets are autonomous (AI) and never routed through
     /// AgentController. External systems steer it through a small primitive-based API:
     ///   - CustomerSpawner calls BeginArrival (Task 3)
+    ///   - ReceptionQueue calls SendToQueueSlot / MoveToQueueSlot / LeaveFacility (Task 4)
     ///   - ServiceDispatcher calls SendToStation and CompleteService (Task 5)
-    /// The dispatcher polls CurrentState (e.g. for BEING_SERVICED) to coordinate the worker/pet
-    /// handshake, so this machine stays decoupled from queue/station/dispatcher types.
+    /// Those systems poll CurrentState (e.g. QUEUING to time patience, BEING_SERVICED to start the
+    /// session) and read the DesiredService/Patience passthroughs, so this machine stays decoupled
+    /// from queue/station/dispatcher types.
     ///
     /// Performance: state changes go through EnterState, which switches Update off for passive
-    /// states (BEING_SERVICED while the session runs, DESPAWNING) that have no per-frame work.
-    /// Only the polling states — which must check NavMesh arrival or tick the patience timer every
-    /// frame — keep Update alive. The enum switch is intentionally kept: it allocates nothing,
-    /// whereas a cached-delegate dispatch would allocate on every state change.
+    /// states (QUEUING — ReceptionQueue owns the patience timer; BEING_SERVICED while the session
+    /// runs; DESPAWNING) that have no per-frame work. Only the movement-polling states, which must
+    /// check NavMesh arrival every frame, keep Update alive. The enum switch is intentionally kept:
+    /// it allocates nothing, whereas a cached-delegate dispatch would allocate on every state change.
     /// </summary>
     [RequireComponent(typeof(Pet))]
     public class PetStateMachine : MonoBehaviour
     {
         private Pet pet;
         private PetState currentState;
-        private float queueWaitTimer;
         private Vector3 exitPoint;
         private bool hasExitPoint;
 
         public PetState CurrentState
         {
             get { return currentState; }
+        }
+
+        public ServiceType DesiredService
+        {
+            get { return pet.GetDesiredService(); }
+        }
+
+        public float Patience
+        {
+            get { return pet.GetPatience(); }
         }
 
         private void Awake()
@@ -40,14 +52,42 @@ namespace PawsAndCare.Pets
         }
 
         /// <summary>
-        /// Spawner entry point (Task 3): records the facility exit and sends the pet to reception.
+        /// Spawner entry point (Task 3/4): records the facility exit. ReceptionQueue drives the
+        /// first move via SendToQueueSlot once it assigns a slot (or the spawner calls LeaveFacility
+        /// if the queue is full), so no movement happens here.
         /// </summary>
-        public void BeginArrival(Vector3 receptionPoint, Vector3 facilityExit)
+        public void BeginArrival(Vector3 facilityExit)
         {
             exitPoint = facilityExit;
             hasExitPoint = true;
-            pet.MoveTo(receptionPoint);
+        }
+
+        /// <summary>
+        /// ReceptionQueue call (Task 4): walk to a freshly assigned queue slot. On arrival the pet
+        /// settles into QUEUING, where ReceptionQueue starts timing its patience.
+        /// </summary>
+        public void SendToQueueSlot(Vector3 slotPosition)
+        {
+            pet.MoveTo(slotPosition);
             EnterState(PetState.ARRIVING);
+        }
+
+        /// <summary>
+        /// ReceptionQueue call (Task 4): shift forward as the line advances. Stays in its current
+        /// state — moving up the line isn't a fresh wait, so the patience clock keeps running.
+        /// </summary>
+        public void MoveToQueueSlot(Vector3 slotPosition)
+        {
+            pet.MoveTo(slotPosition);
+        }
+
+        /// <summary>
+        /// ReceptionQueue/spawner call (Task 4): turn the pet away to the exit — the queue was full
+        /// on arrival, or its patience ran out while waiting.
+        /// </summary>
+        public void LeaveFacility()
+        {
+            BeginLeaving();
         }
 
         /// <summary>
@@ -75,9 +115,6 @@ namespace PawsAndCare.Pets
                 case PetState.ARRIVING:
                     TickArriving();
                     break;
-                case PetState.QUEUING:
-                    TickQueuing();
-                    break;
                 case PetState.MOVING_TO_STATION:
                     TickMovingToStation();
                     break;
@@ -91,19 +128,9 @@ namespace PawsAndCare.Pets
         {
             if (pet.HasReachedDestination())
             {
-                queueWaitTimer = 0.0f;
+                // Parked at the queue slot; ReceptionQueue takes over and times the patience.
+                // EnterState switches Update off — QUEUING has no per-frame work for the pet.
                 EnterState(PetState.QUEUING);
-            }
-        }
-
-        private void TickQueuing()
-        {
-            queueWaitTimer += Time.deltaTime;
-
-            if (queueWaitTimer >= pet.GetPatience())
-            {
-                // Waited too long — leave unhappy. Reputation penalty hooks in at a later milestone.
-                BeginLeaving();
             }
         }
 
@@ -142,11 +169,11 @@ namespace PawsAndCare.Pets
         }
 
         // Gates Update() via enabled: passive states don't poll. Public methods still work while
-        // disabled, so the dispatcher can call CompleteService on a serviced pet.
+        // disabled, so ReceptionQueue/dispatcher can steer a waiting or serviced pet.
         private void EnterState(PetState newState)
         {
             currentState = newState;
-            // true = polls every frame (arrival/patience); false = passive wait, Update() off.
+            // true = polls NavMesh arrival every frame; false = passive wait, Update() off.
             this.enabled = StateNeedsTicking(newState);
         }
 
@@ -154,7 +181,6 @@ namespace PawsAndCare.Pets
         {
             bool needsTicking =
                 state == PetState.ARRIVING
-                || state == PetState.QUEUING
                 || state == PetState.MOVING_TO_STATION
                 || state == PetState.LEAVING;
 

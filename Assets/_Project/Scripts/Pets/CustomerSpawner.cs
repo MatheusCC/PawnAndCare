@@ -1,15 +1,16 @@
 using UnityEngine;
+using PawsAndCare.Services;
 
 namespace PawsAndCare.Pets
 {
     /// <summary>
     /// Spawns customer pets on a timer once the game is running. Each spawn picks a random pet
-    /// prefab (each prefab carries its own PetDefinition), drops it at the entrance, and hands it
-    /// to its PetStateMachine via BeginArrival so it walks to reception and queues.
+    /// prefab (each prefab carries its own PetDefinition), drops it at the entrance, records its
+    /// exit via BeginArrival, then enqueues it into the ReceptionQueue (which walks it to a slot).
+    /// A full queue turns the pet away straight to the exit.
     ///
     /// Pacing is a simple random interval for now; day-phase gating wires in when DayManager lands
-    /// (Phase 2 Task 8). The reception point is a placeholder until ReceptionQueue replaces it with
-    /// real queue slots (Task 4).
+    /// (Phase 2 Task 8).
     /// </summary>
     public class CustomerSpawner : MonoBehaviour
     {
@@ -20,10 +21,6 @@ namespace PawsAndCare.Pets
         [SerializeField]
         [Tooltip("Where pets appear. Must sit on the NavMesh.")]
         private Transform entrancePoint = null;
-
-        [SerializeField]
-        [Tooltip("Where pets walk to and wait. Placeholder until ReceptionQueue lands (Task 4). Must sit on the NavMesh.")]
-        private Transform receptionPoint = null;
 
         [SerializeField]
         [Tooltip("Where pets walk to before despawning. Must sit on the NavMesh.")]
@@ -58,7 +55,7 @@ namespace PawsAndCare.Pets
             }
             else
             {
-                Debug.LogError("[CustomerSpawner] Setup is incomplete — assign pet prefabs and the entrance/reception/exit points in the inspector.", this);
+                Debug.LogError("[CustomerSpawner] Setup is incomplete — assign pet prefabs and the entrance/exit points in the inspector.", this);
             }
         }
 
@@ -81,7 +78,20 @@ namespace PawsAndCare.Pets
 
             if (stateMachine != null)
             {
-                stateMachine.BeginArrival(receptionPoint.position, exitPoint.position);
+                stateMachine.BeginArrival(exitPoint.position);
+
+                if (ReceptionQueue.Instance != null)
+                {
+                    if (!ReceptionQueue.Instance.TryEnqueue(stateMachine))
+                    {
+                        // Queue is full — turn the pet away straight to the exit.
+                        stateMachine.LeaveFacility();
+                    }
+                }
+                else
+                {
+                    Debug.LogError("[CustomerSpawner] No ReceptionQueue in scene — cannot enqueue spawned pet.", this);
+                }
             }
             else
             {
@@ -96,8 +106,8 @@ namespace PawsAndCare.Pets
 
         private bool HasValidSetup()
         {
-            bool valid = petPrefabs != null && petPrefabs.Length > 0 && entrancePoint != null
-                        && receptionPoint != null && exitPoint != null;
+            bool valid = petPrefabs != null && petPrefabs.Length > 0
+                        && entrancePoint != null && exitPoint != null;
 
             return valid;
         }
