@@ -134,14 +134,16 @@ Mirrors the existing `WorkerData`/`ServiceData` SO pattern.
 
 ---
 
-## Task 7 — Customer Loop Validation `[TODO]`
+## Task 7 — Customer Loop Validation `[DONE]`
 
-- [ ] 7.1 Pet spawns, paths to reception, occupies a queue slot
-- [ ] 7.2 Dispatcher matches pet + station + worker; both converge at the station
-- [ ] 7.3 Service runs (progress bar fills), completes, pet pays, balance increases
-- [ ] 7.4 Pet paths to exit and despawns; worker + station free up
-- [ ] 7.5 Multiple pets queue and are serviced in order; patience timeout sends an unserved pet away
-- [ ] 7.6 Full-chain playtest confirmed
+- [x] 7.1 Pet spawns and is seated at a free station (or occupies a queue slot when all stations are busy — seat-first model)
+- [x] 7.2 Dispatcher matches pet + station + worker; both converge at the station
+- [x] 7.3 Service runs (progress bar fills), completes, pet pays, balance increases
+- [x] 7.4 Pet paths to exit and despawns; worker + station free up
+- [x] 7.5 Multiple pets queue and are serviced in order; patience timeout sends an unserved (queued) pet away
+- [x] 7.6 Full-chain playtest confirmed
+
+**First vertical slice (Tasks 1–7) complete:** pets spawn → seat/queue → converge with a worker → get serviced → pay → leave, with money on the line.
 
 ---
 
@@ -159,10 +161,10 @@ Detailed once the Customer Loop is working. Sequenced by dependency:
 
 ## Phase 2 Definition of Done `[DRAFT]`
 
-- [ ] Pets spawn, queue, and are serviced autonomously (no manual clicking required for the core loop)
-- [ ] Pet ↔ station ↔ worker convergence works; `ServiceSession` tracks the customer
-- [ ] Completed services produce revenue; a running balance is visible
-- [ ] Unserved pets leave on patience timeout
+- [x] Pets spawn, queue, and are serviced autonomously (no manual clicking required for the core loop)
+- [x] Pet ↔ station ↔ worker convergence works; `ServiceSession` tracks the customer
+- [x] Completed services produce revenue; a running balance is visible
+- [x] Unserved pets leave on patience timeout
 - [ ] Day cycle progresses with phases and speed control; day-end revenue summary fires
 - [ ] Reputation responds to service quality and wait times
 - [ ] Game state persists across save/load
