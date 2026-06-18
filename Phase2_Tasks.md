@@ -118,17 +118,19 @@ Mirrors the existing `WorkerData`/`ServiceData` SO pattern.
 
 ---
 
-## Task 6 — Economy: Close the Loop `[TODO]`
+## Task 6 — Economy: Close the Loop `[DONE]`
 
 ### 6A — EconomyManager
-- [ ] 6A.1 `EconomyManager : Singleton<EconomyManager>` in `Scripts/Economy/`
-- [ ] 6A.2 Subscribe to `ServiceCompletedEvent`; revenue = `ServiceData.BasePrice` modulated by `quality` (the field already computed in `ServiceSession`)
-- [ ] 6A.3 Track running balance; publish `BalanceChangedEvent`
-- [ ] 6A.4 Pet pays on departure (or on completion); then transitions to Leaving
+- [x] 6A.1 `EconomyManager : Singleton<EconomyManager>` in `Scripts/Economy/`
+- [x] 6A.2 Subscribes to `ServiceCompletedEvent`; revenue = `BasePrice × Quality` (full-quality price scaled by the session's achieved quality)
+- [x] 6A.3 Tracks running balance (`startingBalance` in inspector); publishes `BalanceChangedEvent` (`NewBalance` + `Delta`) via the `ApplyDelta` chokepoint (reused by future spending)
+- [x] 6A.4 Charges **on completion** (event already carries the session); pet→Leaving was already handled by `ServiceDispatcher.CompleteJob`
 
 ### 6B — First money readout
-- [ ] 6B.1 Temporary debug HUD: current balance (full UI pass deferred to polish)
-- [ ] 6B.2 Day-end revenue summary wired to `DayEndedEvent` once DayManager lands (Task 8)
+- [x] 6B.1 `EconomyDebugHud` — OnGUI overlay drawing the current balance (32pt gold), reading `EconomyManager.Instance` directly. Full UI pass deferred to polish
+- [ ] 6B.2 Day-end revenue summary wired to `DayEndedEvent` once DayManager lands (Task 8) — **deferred**
+
+**Note:** revenue is charged on completion via `ServiceCompletedEvent`; `BalanceChangedEvent` is published for the real UI / floaters later. The debug HUD pulls the balance each frame (robust against event ordering, shows the starting balance immediately).
 
 ---
 
