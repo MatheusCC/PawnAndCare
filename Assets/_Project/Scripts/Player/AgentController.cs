@@ -1,18 +1,15 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using PawsAndCare.Core;
 using PawsAndCare.Input;
-using PawsAndCare.Interaction;
-using PawsAndCare.Services;
 using PawsAndCare.Workers;
 
 namespace PawsAndCare.Player
 {
     /// <summary>
-    /// Scene-level player input router. Left-click on a Worker selects it; left-click on the floor
-    /// commands the selected Worker to move there. Station clicks are owned by the interaction layer
-    /// and reach this router as a StationSelectedEvent, which dispatches the worker to that station.
-    /// All worker behavior runs through WorkerServiceRunner — this class only routes intent.
+    /// Scene-level player input router. Left-click on a Worker selects it (visual only for now).
+    /// In the Phase 2 auto-assign model, ServiceDispatcher drives workers to stations, so the player
+    /// no longer issues move or station-assign orders here — manual worker control returns as a
+    /// later milestone. This class only tracks the current selection.
     /// </summary>
     public class AgentController : MonoBehaviour
     {
@@ -21,15 +18,13 @@ namespace PawsAndCare.Player
 
         private CameraInputActions input;
         private Worker selectedWorker;
-        private WorkerServiceRunner selectedRunner;
 
         private void Awake()
         {
             // Instantiate the generated input wrapper and subscribe to the Click action.
-            // Click fires once on press (Button type), matching the "issue an order" gesture.
+            // Click fires once on press (Button type), matching the "select" gesture.
             input = new CameraInputActions();
             input.Camera.Click.performed += OnClick;
-            EventBus.Subscribe<StationSelectedEvent>(OnStationSelected);
         }
 
         private void OnEnable()
@@ -48,7 +43,6 @@ namespace PawsAndCare.Player
             // with domain reload disabled leaks subscriptions across sessions.
             input.Camera.Click.performed -= OnClick;
             input.Dispose();
-            EventBus.Unsubscribe<StationSelectedEvent>(OnStationSelected);
         }
 
         private void OnClick(InputAction.CallbackContext context)
@@ -79,18 +73,10 @@ namespace PawsAndCare.Player
                 {
                     SelectWorker(clickedWorker);
                 }
-                else if (hit.collider.GetComponentInParent<IInteractable>() == null && selectedRunner != null)
-                {
-                    // Floor (non-interactable) click with a worker selected → move order.
-                    // Interactable clicks (stations) are owned by the interaction layer via
-                    // StationSelectedEvent, so they must not also trigger a raw move here.
-                    selectedRunner.RequestMove(hit.point);
-                }
             }
         }
 
-        // Selection caches the worker and its service runner once, so per-click routing never
-        // re-runs GetComponent. Re-selecting the already-selected worker is a no-op.
+        // Selection caches the worker, so re-selecting the already-selected worker is a no-op.
         private void SelectWorker(Worker worker)
         {
             if (selectedWorker != worker)
@@ -101,23 +87,7 @@ namespace PawsAndCare.Player
                 }
 
                 selectedWorker = worker;
-                selectedRunner = worker.GetComponent<WorkerServiceRunner>();
                 selectedWorker.SetSelectionIndicatorActive(true);
-
-                if (selectedRunner == null)
-                {
-                    Debug.LogError("[AgentController] Selected worker has no WorkerServiceRunner — it cannot perform services.", this);
-                }
-            }
-        }
-
-        // A station was selected through the interaction layer. If a worker is selected,
-        // dispatch it to walk to that station and perform its service.
-        private void OnStationSelected(StationSelectedEvent eventData)
-        {
-            if (selectedRunner != null)
-            {
-                selectedRunner.AssignStation(eventData.Station);
             }
         }
     }

@@ -87,32 +87,34 @@ Mirrors the existing `WorkerData`/`ServiceData` SO pattern.
 
 ---
 
-## Task 5 — Service Dispatch & Convergence `[TODO]` `(THE CRUX)`
+## Task 5 — Service Dispatch & Convergence `[DONE]` `(THE CRUX)`
 
-**The agreed refactor lives here.** In Phase 1, `WorkerServiceRunner` owned "walk to station → start service" because the worker was the only actor. With a pet as a second actor, the "start once everyone has arrived" handshake moves to a neutral owner.
+**The agreed refactor lives here.** In Phase 1, `WorkerServiceRunner` owned "walk to station → start service" because the worker was the only actor. With a pet as a second actor, the "start once everyone has arrived" handshake moved to the neutral `ServiceDispatcher`.
+
+**Decision (was the open question):** **auto-assign (manager mode)** — no clicking for the core loop, per the Phase 2 DoD. Manual worker control is intentionally deferred to a later milestone. Match model is **seat-first**: a pet is seated at a free station on arrival (reserving it) and only waits in the queue when no station is free; a free worker is sent to any station that has a pet but no worker.
 
 ### 5A — WorkerServiceRunner refactor
-- [ ] 5A.1 Slim `WorkerServiceRunner`: keep "go to anchor, report arrival" + reservation release on cancel; **remove** the `ServiceManager.StartService` call (dispatcher owns it now)
-- [ ] 5A.2 Expose an arrival signal (event or polled `HasArrivedAtStation`) the dispatcher can read
-- [ ] 5A.3 Verify Phase 1 manual-click flow still works (or is intentionally superseded — see open question below)
+- [x] 5A.1 Slimmed to `GoToStation` / `Release`; **removed** the `ServiceManager.StartService` call, progress mirroring, session, and occupancy (dispatcher owns them)
+- [x] 5A.2 Polled arrival signal `HasArrivedAtStation` (latched); plus `IsBusy` and a `Worker` accessor for the dispatcher/WorkerManager
+- [x] 5A.3 Phase 1 manual-click flow **intentionally superseded** — `AgentController` reduced to worker selection-only; assign/move return with the manual milestone
 
 ### 5B — ServiceDispatcher
-- [ ] 5B.1 `ServiceDispatcher : Singleton<ServiceDispatcher>` in `Scripts/Services/`
-- [ ] 5B.2 Matchmaking: front-of-queue pet (wants `ServiceType` X) ↔ `StationManager.GetAvailableStation(X)` ↔ a free worker (see Task 5C)
-- [ ] 5B.3 On match: reserve station, dispatch worker to `workerAnchor`, dispatch pet to a new station `customerAnchor`
-- [ ] 5B.4 Both-arrived handshake: when worker AND pet report arrival → `ServiceManager.StartService(station, service, worker, pet)`
-- [ ] 5B.5 Add `customerAnchor` Transform to `ServiceStation` (where the pet stands/sits)
+- [x] 5B.1 `ServiceDispatcher : Singleton<ServiceDispatcher>` in `Scripts/Services/`
+- [x] 5B.2 `AdmitPet`: seat at `GetAvailableStation(type)`, else `ReceptionQueue.TryEnqueue`; freed stations pull `PeekNextForService(type)` from the queue
+- [x] 5B.3 On seat: reserve station, send pet to `customerAnchor`; free worker sent to `workerAnchor` (parallel convergence, not a single atomic match)
+- [x] 5B.4 Both-arrived handshake: `runner.HasArrivedAtStation` AND `pet.CurrentState == BEING_SERVICED` → `ServiceManager.StartService(station, service, worker, pet)`
+- [x] 5B.5 `customerAnchor` Transform added to `ServiceStation` (+ missing-anchor warning)
 
 ### 5C — Worker availability
-- [ ] 5C.1 `WorkerManager : Singleton<WorkerManager>` registry (mirrors `StationManager`); workers self-register on spawn
-- [ ] 5C.2 `GetAvailableWorker(ServiceType)` — free worker, optionally ranked by `GetSkillRating`
-- [ ] 5C.3 Free/busy tracking driven by `WorkerServiceRunner` state
+- [x] 5C.1 `WorkerManager : Singleton<WorkerManager>` in `Scripts/Workers/`, mirrors `StationManager`; runners self-register on `Start`
+- [x] 5C.2 `GetAvailableWorker(ServiceType)` — free worker ranked by `GetSkillRating` (best-skill idle worker, one-pass max scan)
+- [x] 5C.3 Free/busy via `WorkerServiceRunner.IsBusy` (committed from `GoToStation` until `Release`)
 
 ### 5D — ServiceSession gains the customer
-- [ ] 5D.1 Add `Pet` (customer) field to `ServiceSession`; thread through `ServiceManager.StartService` signature
-- [ ] 5D.2 On completion, session exposes the pet so it can be sent to Leaving + charged
+- [x] 5D.1 `Pet` (customer) field added to `ServiceSession`; threaded through `ServiceManager.StartService`
+- [x] 5D.2 On completion the dispatcher reads the job's pet → `CompleteService` (leaves); `session.Pet` exposed for charging (Task 6)
 
-> **Open design question to resolve when detailing 5B:** does the player still *manually* assign workers (Phase 1 click flow as an override), or does the dispatcher fully auto-assign (manager-mode)? The `ServiceDispatcher` owns the convergence handshake either way; this only changes who *initiates* the match. Needs a GDD check.
+**Note:** a seated pet does **not** time out while waiting for a worker (patience lives only in the reception queue for now); seated-patience can be added with reputation/polish.
 
 ---
 

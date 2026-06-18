@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using PawsAndCare.Core;
+using PawsAndCare.Pets;
 using PawsAndCare.Workers;
 
 namespace PawsAndCare.Services
@@ -25,20 +26,20 @@ namespace PawsAndCare.Services
         /// Creates and begins tracking a new session. Publishes ServiceStartedEvent.
         /// Returns the created session, or null if any argument was invalid.
         /// </summary>
-        public ServiceSession StartService(ServiceStation station, ServiceData service, Worker worker)
+        public ServiceSession StartService(ServiceStation station, ServiceData service, Worker worker, PetStateMachine pet)
         {
             ServiceSession session = null;
 
-            if (station != null && service != null && worker != null)
+            if (station != null && service != null && worker != null && pet != null)
             {
-                session = new ServiceSession(nextSessionId, service, station, worker);
+                session = new ServiceSession(nextSessionId, service, station, worker, pet);
                 nextSessionId++;
                 activeSessions.Add(session);
                 EventBus.Publish(new ServiceStartedEvent(session));
             }
             else
             {
-                Debug.LogError("[ServiceManager] StartService called with a null station, service, or worker — no session created.", this);
+                Debug.LogError("[ServiceManager] StartService called with a null station, service, worker, or pet — no session created.", this);
             }
 
             return session;

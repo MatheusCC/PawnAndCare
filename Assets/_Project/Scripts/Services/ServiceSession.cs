@@ -1,9 +1,10 @@
+using PawsAndCare.Pets;
 using PawsAndCare.Workers;
 
 namespace PawsAndCare.Services
 {
     /// <summary>
-    /// One run of a service: which service, at which station, by which worker.
+    /// One run of a service: which service, at which station, by which worker, for which pet.
     /// Owns progress and the final quality result. Progress is advanced externally
     /// (by ServiceManager) so the session itself stays a pure data + math object.
     /// </summary>
@@ -17,6 +18,7 @@ namespace PawsAndCare.Services
         private readonly ServiceData service;
         private readonly ServiceStation station;
         private readonly Worker worker;
+        private readonly PetStateMachine pet;
         private float progress;
         private float quality;
         private ServiceStatus status;
@@ -25,16 +27,18 @@ namespace PawsAndCare.Services
         public ServiceData Service { get { return service; } }
         public ServiceStation Station { get { return station; } }
         public Worker Worker { get { return worker; } }
+        public PetStateMachine Pet { get { return pet; } }
         public float Progress { get { return progress; } }
         public float Quality { get { return quality; } }
         public ServiceStatus Status { get { return status; } }
 
-        public ServiceSession(int sessionId, ServiceData service, ServiceStation station, Worker worker)
+        public ServiceSession(int sessionId, ServiceData service, ServiceStation station, Worker worker, PetStateMachine pet)
         {
             this.sessionId = sessionId;
             this.service = service;
             this.station = station;
             this.worker = worker;
+            this.pet = pet;
             progress = 0.0f;
             quality = 0.0f;
             status = ServiceStatus.IN_PROGRESS;

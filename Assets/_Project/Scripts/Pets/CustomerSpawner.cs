@@ -6,8 +6,8 @@ namespace PawsAndCare.Pets
     /// <summary>
     /// Spawns customer pets on a timer once the game is running. Each spawn picks a random pet
     /// prefab (each prefab carries its own PetDefinition), drops it at the entrance, records its
-    /// exit via BeginArrival, then enqueues it into the ReceptionQueue (which walks it to a slot).
-    /// A full queue turns the pet away straight to the exit.
+    /// exit via BeginArrival, then admits it through the ServiceDispatcher (which seats it at a free
+    /// station or queues it). A pet that can't be placed at all is turned away straight to the exit.
     ///
     /// Pacing is a simple random interval for now; day-phase gating wires in when DayManager lands
     /// (Phase 2 Task 8).
@@ -80,17 +80,17 @@ namespace PawsAndCare.Pets
             {
                 stateMachine.BeginArrival(exitPoint.position);
 
-                if (ReceptionQueue.Instance != null)
+                if (ServiceDispatcher.Instance != null)
                 {
-                    if (!ReceptionQueue.Instance.TryEnqueue(stateMachine))
+                    if (!ServiceDispatcher.Instance.AdmitPet(stateMachine))
                     {
-                        // Queue is full — turn the pet away straight to the exit.
+                        // No free station and the queue is full — turn the pet away to the exit.
                         stateMachine.LeaveFacility();
                     }
                 }
                 else
                 {
-                    Debug.LogError("[CustomerSpawner] No ReceptionQueue in scene — cannot enqueue spawned pet.", this);
+                    Debug.LogError("[CustomerSpawner] No ServiceDispatcher in scene — cannot admit spawned pet.", this);
                 }
             }
             else

@@ -22,6 +22,10 @@ namespace PawsAndCare.Services
         private Transform workerAnchor = null;
 
         [SerializeField]
+        [Tooltip("World-space anchor where the customer pet should stand/sit to receive the service.")]
+        private Transform customerAnchor = null;
+
+        [SerializeField]
         private bool isOccupied = false;
 
         [SerializeField]
@@ -61,6 +65,11 @@ namespace PawsAndCare.Services
         public Transform WorkerAnchor
         {
             get { return workerAnchor; }
+        }
+
+        public Transform CustomerAnchor
+        {
+            get { return customerAnchor; }
         }
 
         public bool IsOccupied
@@ -127,6 +136,11 @@ namespace PawsAndCare.Services
             if (workerAnchor == null)
             {
                 Debug.LogWarning("[ServiceStation] workerAnchor is missing — Workers will have no stand position. Assign one in the inspector.", this);
+            }
+
+            if (customerAnchor == null)
+            {
+                Debug.LogWarning("[ServiceStation] customerAnchor is missing — pets will have no stand position. Assign one in the inspector.", this);
             }
 
             if (serviceData != null)

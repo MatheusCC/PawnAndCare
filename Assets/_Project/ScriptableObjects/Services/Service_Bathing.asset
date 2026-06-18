@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Service_Bathing
   m_EditorClassIdentifier: Assembly-CSharp::PawsAndCare.Services.ServiceDefinition
   serviceType: 1
-  baseDuration: 60
+  baseDuration: 5
   basePrice: 25
   requiredStationType: BathTub
   description: 

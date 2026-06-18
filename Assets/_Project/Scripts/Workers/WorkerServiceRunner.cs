@@ -4,25 +4,41 @@ using PawsAndCare.Services;
 namespace PawsAndCare.Workers
 {
     /// <summary>
-    /// Owns a worker's "go to a station and perform its service" behavior: reserve the station,
-    /// walk to its anchor, start the session on arrival, drive the station's progress bar, and
-    /// release everything on completion or cancellation. Sits beside Worker (movement primitive)
-    /// so the worker's job-execution state stays out of the input layer.
+    /// A worker's "walk to a station's worker anchor and report arrival" behavior. Sits beside Worker
+    /// (the movement primitive) so job execution stays out of the input layer. In the Phase 2
+    /// auto-assign model, ServiceDispatcher owns the match: it reserves the station, starts the
+    /// session once both worker and pet have arrived, drives progress, and calls Release on
+    /// completion. This runner only walks the worker where told and latches whether it has arrived —
+    /// it knows nothing about sessions, progress, or pets.
     /// </summary>
     [RequireComponent(typeof(Worker))]
     public class WorkerServiceRunner : MonoBehaviour
     {
         private Worker worker;
         private ServiceStation assignedStation;
-        private ServiceSession activeSession;
-        private bool isMovingToStation;
+        private bool hasArrived;
 
         /// <summary>
-        /// True once a session is running — the worker is locked to the station until it completes.
+        /// True while the worker is committed to a station (walking there or working it), so
+        /// WorkerManager won't hand it a second job until Release.
         /// </summary>
-        public bool IsServicing
+        public bool IsBusy
         {
-            get { return activeSession != null; }
+            get { return assignedStation != null; }
+        }
+
+        /// <summary>
+        /// True once the worker has reached its assigned station's worker anchor. The dispatcher
+        /// polls this for the worker side of the both-arrived handshake.
+        /// </summary>
+        public bool HasArrivedAtStation
+        {
+            get { return hasArrived; }
+        }
+
+        public Worker Worker
+        {
+            get { return worker; }
         }
 
         private void Awake()
@@ -30,111 +46,62 @@ namespace PawsAndCare.Workers
             worker = GetComponent<Worker>();
         }
 
-        /// <summary>
-        /// Player order: reserve the station and walk the worker to it to perform its service.
-        /// Replaces any previous assignment.
-        /// </summary>
-        public void AssignStation(ServiceStation station)
+        // Start (not Awake): WorkerManager is a Singleton initialised in its own Awake. Using Start
+        // means every singleton's Awake has run, so WorkerManager.Instance is non-null regardless of
+        // GameObject wake order.
+        private void Start()
         {
-            if (station != null && station.WorkerAnchor != null)
+            if (WorkerManager.Instance != null)
             {
-                ClearAssignment();
-                assignedStation = station;
-                assignedStation.SetOccupied(true);
-                worker.MoveTo(assignedStation.WorkerAnchor.position);
-                isMovingToStation = true;
+                WorkerManager.Instance.Register(this);
             }
             else
             {
-                Debug.LogError("[WorkerServiceRunner] AssignStation requires a station with a WorkerAnchor.", this);
+                Debug.LogWarning("[WorkerServiceRunner] WorkerManager.Instance is null at Start — worker will not be available for dispatch.", this);
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (WorkerManager.Instance != null)
+            {
+                WorkerManager.Instance.Unregister(this);
             }
         }
 
         /// <summary>
-        /// Player order: walk to a free point. Ignored while a service is in progress so the
-        /// worker can't be pulled off an active station mid-service.
+        /// Dispatcher order (Task 5): walk the worker to the station's worker anchor. Reservation and
+        /// session start are owned by the dispatcher, not here.
         /// </summary>
-        public void RequestMove(Vector3 worldPoint)
+        public void GoToStation(ServiceStation station)
         {
-            if (!IsServicing)
+            if (station != null && station.WorkerAnchor != null)
             {
-                ClearAssignment();
-                worker.MoveTo(worldPoint);
+                assignedStation = station;
+                hasArrived = false;
+                worker.MoveTo(station.WorkerAnchor.position);
             }
+            else
+            {
+                Debug.LogError("[WorkerServiceRunner] GoToStation requires a station with a WorkerAnchor.", this);
+            }
+        }
+
+        /// <summary>
+        /// Dispatcher call (Task 5): the job finished (or was cancelled) — free the worker for new work.
+        /// </summary>
+        public void Release()
+        {
+            assignedStation = null;
+            hasArrived = false;
         }
 
         private void Update()
         {
-            if (assignedStation != null)
+            if (assignedStation != null && !hasArrived && worker.HasReachedDestination())
             {
-                if (isMovingToStation)
-                {
-                    AdvanceToStation();
-                }
-                else
-                {
-                    AdvanceService();
-                }
+                hasArrived = true;
             }
-        }
-
-        // Arrival phase: once at the anchor, hand off to ServiceManager to start the session.
-        private void AdvanceToStation()
-        {
-            if (worker.HasReachedDestination())
-            {
-                isMovingToStation = false;
-                StartServiceAtStation();
-            }
-        }
-
-        private void StartServiceAtStation()
-        {
-            if (ServiceManager.Instance != null)
-            {
-                activeSession = ServiceManager.Instance.StartService(assignedStation, assignedStation.Data, worker);
-            }
-            else
-            {
-                Debug.LogError("[WorkerServiceRunner] ServiceManager.Instance is null — cannot start service.", this);
-            }
-
-            if (activeSession != null)
-            {
-                assignedStation.ShowServiceProgress(0.0f);
-            }
-            else
-            {
-                ClearAssignment();
-            }
-        }
-
-        // Service phase: mirror progress to the station bar; release when the session completes.
-        private void AdvanceService()
-        {
-            if (activeSession != null)
-            {
-                assignedStation.ShowServiceProgress(activeSession.Progress);
-
-                if (activeSession.Status == ServiceStatus.COMPLETED)
-                {
-                    ClearAssignment();
-                }
-            }
-        }
-
-        // Releases the station reservation + progress bar and returns the worker to idle.
-        private void ClearAssignment()
-        {
-            if (assignedStation != null)
-            {
-                assignedStation.SetOccupied(false);
-                assignedStation.HideServiceProgress();
-            }
-
-            assignedStation = null;
-            activeSession = null;
-            isMovingToStation = false;
         }
     }
 }
