@@ -1,16 +1,18 @@
 using UnityEngine;
+using PawsAndCare.Core;
 using PawsAndCare.Services;
 
 namespace PawsAndCare.Pets
 {
     /// <summary>
-    /// Spawns customer pets on a timer once the game is running. Each spawn picks a random pet
-    /// prefab (each prefab carries its own PetDefinition), drops it at the entrance, records its
-    /// exit via BeginArrival, then admits it through the ServiceDispatcher (which seats it at a free
+    /// Spawns customer pets on a timer while the facility is accepting customers. Each spawn picks a
+    /// random pet prefab (each prefab carries its own PetDefinition), drops it at the entrance, records
+    /// its exit via BeginArrival, then admits it through the ServiceDispatcher (which seats it at a free
     /// station or queues it). A pet that can't be placed at all is turned away straight to the exit.
     ///
-    /// Pacing is a simple random interval for now; day-phase gating wires in when DayManager lands
-    /// (Phase 2 Task 8).
+    /// Spawning is gated by the day cycle: it runs only during DayManager's open phases
+    /// (Morning/Midday/Afternoon) and pauses otherwise, with a shorter interval during the Midday rush.
+    /// The full AnimationCurve wave system (TDD §9.2) is deferred to polish.
     /// </summary>
     public class CustomerSpawner : MonoBehaviour
     {
@@ -34,28 +36,46 @@ namespace PawsAndCare.Pets
         [Tooltip("Longest delay between spawns, in seconds.")]
         private float maxSpawnInterval = 12.0f;
 
+        [SerializeField]
+        [Range(0.1f, 1.0f)]
+        [Tooltip("Spawn-interval multiplier during the Midday rush (lower = busier peak).")]
+        private float middayRushFactor = 0.6f;
+
         private float spawnTimer;
 
         private void Awake()
         {
-            // Dormant until GameManager calls StartSpawning — spawning a NavMeshAgent before the
-            // facility's NavMesh exists would land it off-mesh and break pathing.
+            // Subscribe here (not Start) so a disabled spawner still hears the day's opening phase,
+            // and so the subscription is in place before DayManager fires its first phase events.
+            EventBus.Subscribe<DayPhaseChangedEvent>(OnDayPhaseChanged);
+
+            if (!HasValidSetup())
+            {
+                Debug.LogError("[CustomerSpawner] Setup is incomplete — assign pet prefabs and the entrance/exit points in the inspector.", this);
+            }
+
+            // Dormant until a day phase starts accepting customers. Disabled means Update (the spawn
+            // loop) is off, but the EventBus subscription above still fires.
             enabled = false;
         }
 
-        /// <summary>
-        /// Begins timed spawning. Called by GameManager.BootGame after the facility + NavMesh exist.
-        /// </summary>
-        public void StartSpawning()
+        private void OnDestroy()
         {
-            if (HasValidSetup())
+            EventBus.Unsubscribe<DayPhaseChangedEvent>(OnDayPhaseChanged);
+        }
+
+        private void OnDayPhaseChanged(DayPhaseChangedEvent eventData)
+        {
+            bool accepting = DayManager.Instance != null && DayManager.Instance.IsAcceptingCustomers;
+
+            if (accepting && HasValidSetup())
             {
                 ResetTimer();
                 enabled = true;
             }
             else
             {
-                Debug.LogError("[CustomerSpawner] Setup is incomplete — assign pet prefabs and the entrance/exit points in the inspector.", this);
+                enabled = false;
             }
         }
 
@@ -101,7 +121,20 @@ namespace PawsAndCare.Pets
 
         private void ResetTimer()
         {
-            spawnTimer = Random.Range(minSpawnInterval, maxSpawnInterval);
+            spawnTimer = Random.Range(minSpawnInterval, maxSpawnInterval) * PhaseIntervalFactor();
+        }
+
+        // Tighter spawn cadence during the Midday peak; full daily wave shaping is deferred (TDD §9.2).
+        private float PhaseIntervalFactor()
+        {
+            float factor = 1.0f;
+
+            if (DayManager.Instance != null && DayManager.Instance.CurrentPhase == DayPhase.MIDDAY)
+            {
+                factor = middayRushFactor;
+            }
+
+            return factor;
         }
 
         private bool HasValidSetup()

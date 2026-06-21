@@ -128,7 +128,7 @@ Mirrors the existing `WorkerData`/`ServiceData` SO pattern.
 
 ### 6B — First money readout
 - [x] 6B.1 `EconomyDebugHud` — OnGUI overlay drawing the current balance (32pt gold), reading `EconomyManager.Instance` directly. Full UI pass deferred to polish
-- [ ] 6B.2 Day-end revenue summary wired to `DayEndedEvent` once DayManager lands (Task 8) — **deferred**
+- [x] 6B.2 Day-end revenue summary wired to `DayEndedEvent` (Task 8): `EconomyManager` logs the day's revenue/balance on `DayEnded`; full-screen summary UI deferred to polish
 
 **Note:** revenue is charged on completion via `ServiceCompletedEvent`; `BalanceChangedEvent` is published for the real UI / floaters later. The debug HUD pulls the balance each frame (robust against event ordering, shows the starting balance immediately).
 
@@ -151,7 +151,7 @@ Mirrors the existing `WorkerData`/`ServiceData` SO pattern.
 
 Detailed once the Customer Loop is working. Sequenced by dependency:
 
-- **Task 8 — DayManager + Day Cycle** (the deferred Phase 1 Task 11): `currentTime`, `timeScale`, pause, `currentDay`; `DayPhase` enum + boundaries; `DayPhaseChangedEvent`/`DayStartedEvent`/`DayEndedEvent`. Gates spawn pacing (3B.2) and the day-end revenue summary (6B.2).
+- **Task 8 — DayManager + Day Cycle** `[DONE]` (the deferred Phase 1 Task 11): `DayManager` Singleton with `currentTime`/`timeScale`/`SetPaused`/`currentDay`; `DayPhase` enum + serialized hour boundaries; auto-cycling days (PreOpen/Closed beats); `DayPhaseChangedEvent`/`DayStartedEvent`/`DayEndedEvent`. Spawn pacing gated by day phase (3B.2) and day-end revenue summary firing (6B.2) are now closed. Full wave-curve (TDD §9.2) + end-of-day UI (TDD §9.3) deferred to polish.
 - **Task 9 — Reputation:** driven by service quality, queue wait times, and turn-aways (patience timeouts). Consumes the Task 4B queue events.
 - **Task 10 — Persistence:** save/load (balance, reputation, facility, staff) via Newtonsoft JSON; + persistent scene + additive scene loading (deferred Phase 1 2B.5–2B.7).
 - **Task 11 — Staff Progression:** hiring flow, daily salary (`WorkerData.DailySalary` already exists), skill growth over time.
@@ -165,7 +165,7 @@ Detailed once the Customer Loop is working. Sequenced by dependency:
 - [x] Pet ↔ station ↔ worker convergence works; `ServiceSession` tracks the customer
 - [x] Completed services produce revenue; a running balance is visible
 - [x] Unserved pets leave on patience timeout
-- [ ] Day cycle progresses with phases and speed control; day-end revenue summary fires
+- [x] Day cycle progresses with phases and speed control; day-end revenue summary fires (speed/pause via API; player-facing controls deferred to UI polish)
 - [ ] Reputation responds to service quality and wait times
 - [ ] Game state persists across save/load
 - [ ] All code follows CLAUDE.md conventions

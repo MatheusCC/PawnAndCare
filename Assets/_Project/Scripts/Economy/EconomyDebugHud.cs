@@ -26,8 +26,9 @@ namespace PawsAndCare.Economy
             {
                 EnsureStyle();
                 float balance = EconomyManager.Instance.Balance;
+                float dailyRevenue = EconomyManager.Instance.DailyRevenue;
                 Rect rect = new Rect(LABEL_X, LABEL_Y, LABEL_WIDTH, LABEL_HEIGHT);
-                GUI.Label(rect, $"Balance: ${balance:0.00}", labelStyle);
+                GUI.Label(rect, $"Balance: ${balance:0.00}\nToday: ${dailyRevenue:0.00}", labelStyle);
             }
         }
 

@@ -1,7 +1,6 @@
 using UnityEngine;
 using PawsAndCare.Building;
 using PawsAndCare.Workers;
-using PawsAndCare.Pets;
 
 namespace PawsAndCare.Core
 {
@@ -23,8 +22,6 @@ namespace PawsAndCare.Core
         private FacilityBuilder facilityBuilder = null;
         [SerializeField]
         private WorkerSpawner workerSpawner = null;
-        [SerializeField]
-        private CustomerSpawner customerSpawner = null;
 
         private GameState currentState;
         private GameState previousState;
@@ -77,13 +74,13 @@ namespace PawsAndCare.Core
                 Debug.LogWarning("[GameManager] WorkerSpawner reference is missing — assign one in the inspector.", this);
             }
 
-            if (customerSpawner != null)
+            if (DayManager.Instance != null)
             {
-                customerSpawner.StartSpawning();
+                DayManager.Instance.BeginDayCycle();
             }
             else
             {
-                Debug.LogWarning("[GameManager] CustomerSpawner reference is missing — assign one in the inspector.", this);
+                Debug.LogWarning("[GameManager] DayManager.Instance is null — the day cycle (and customer spawning) will not start.", this);
             }
 
             ChangeState(GameState.PLAYING);
