@@ -152,7 +152,7 @@ Mirrors the existing `WorkerData`/`ServiceData` SO pattern.
 Detailed once the Customer Loop is working. Sequenced by dependency:
 
 - **Task 8 — DayManager + Day Cycle** `[DONE]` (the deferred Phase 1 Task 11): `DayManager` Singleton with `currentTime`/`timeScale`/`SetPaused`/`currentDay`; `DayPhase` enum + serialized hour boundaries; auto-cycling days (PreOpen/Closed beats); `DayPhaseChangedEvent`/`DayStartedEvent`/`DayEndedEvent`. Spawn pacing gated by day phase (3B.2) and day-end revenue summary firing (6B.2) are now closed. Full wave-curve (TDD §9.2) + end-of-day UI (TDD §9.3) deferred to polish.
-- **Task 9 — Reputation:** driven by service quality, queue wait times, and turn-aways (patience timeouts). Consumes the Task 4B queue events.
+- **Task 9 — Reputation** `[DONE]`: `ReputationManager` (Singleton, 0–100 additive score) reacts to `ServiceCompletedEvent` (quality→1–5★ review delta) and `PetLeftQueueEvent`/`ABANDONED` turn-aways (penalty); clamps and publishes `ReputationChangedEvent`. `ReputationDebugHud` readout. Reputation-driven gameplay (customer tier, unlock tree — TDD §18.2) deferred. Note: with skill-only quality, neutral service is 3★ (flat); skilled staff drive gains.
 - **Task 10 — Persistence:** save/load (balance, reputation, facility, staff) via Newtonsoft JSON; + persistent scene + additive scene loading (deferred Phase 1 2B.5–2B.7).
 - **Task 11 — Staff Progression:** hiring flow, daily salary (`WorkerData.DailySalary` already exists), skill growth over time.
 - **Task 12 — Polish pass:** Object Pooling for pets, real UI, temperament/size behavioral effects, audio/feedback.
@@ -166,7 +166,7 @@ Detailed once the Customer Loop is working. Sequenced by dependency:
 - [x] Completed services produce revenue; a running balance is visible
 - [x] Unserved pets leave on patience timeout
 - [x] Day cycle progresses with phases and speed control; day-end revenue summary fires (speed/pause via API; player-facing controls deferred to UI polish)
-- [ ] Reputation responds to service quality and wait times
+- [x] Reputation responds to service quality and wait times
 - [ ] Game state persists across save/load
 - [ ] All code follows CLAUDE.md conventions
 
