@@ -34,6 +34,7 @@ namespace PawsAndCare.Economy
             balance = startingBalance;
             dailyRevenue = 0.0f;
             EventBus.Subscribe<ServiceCompletedEvent>(OnServiceCompleted);
+            EventBus.Subscribe<ExpenseIncurredEvent>(OnExpenseIncurred);
             EventBus.Subscribe<DayStartedEvent>(OnDayStarted);
             EventBus.Subscribe<DayEndedEvent>(OnDayEnded);
         }
@@ -41,6 +42,7 @@ namespace PawsAndCare.Economy
         protected override void OnDestroy()
         {
             EventBus.Unsubscribe<ServiceCompletedEvent>(OnServiceCompleted);
+            EventBus.Unsubscribe<ExpenseIncurredEvent>(OnExpenseIncurred);
             EventBus.Unsubscribe<DayStartedEvent>(OnDayStarted);
             EventBus.Unsubscribe<DayEndedEvent>(OnDayEnded);
             base.OnDestroy();
@@ -53,6 +55,12 @@ namespace PawsAndCare.Economy
             float revenue = eventData.Session.Service.BasePrice * eventData.Quality;
             dailyRevenue += revenue;
             ApplyDelta(revenue);
+        }
+
+        private void OnExpenseIncurred(ExpenseIncurredEvent eventData)
+        {
+            // Expenses (salary, hiring, …) are negative deltas through the same chokepoint as revenue.
+            ApplyDelta(-eventData.Amount);
         }
 
         private void OnDayStarted(DayStartedEvent eventData)

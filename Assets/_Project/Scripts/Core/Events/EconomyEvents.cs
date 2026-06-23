@@ -1,3 +1,5 @@
+using PawsAndCare.Economy;
+
 namespace PawsAndCare.Core
 {
     /// <summary>
@@ -24,6 +26,32 @@ namespace PawsAndCare.Core
         {
             this.newBalance = newBalance;
             this.delta = delta;
+        }
+    }
+
+    /// <summary>
+    /// Published by systems that incur a business expense (e.g. StaffOffice payroll and hiring).
+    /// EconomyManager subscribes and deducts the amount, mirroring how it adds service revenue.
+    /// </summary>
+    public readonly struct ExpenseIncurredEvent
+    {
+        private readonly float amount;
+        private readonly ExpenseType type;
+
+        public float Amount
+        {
+            get { return amount; }
+        }
+
+        public ExpenseType Type
+        {
+            get { return type; }
+        }
+
+        public ExpenseIncurredEvent(float amount, ExpenseType type)
+        {
+            this.amount = amount;
+            this.type = type;
         }
     }
 }

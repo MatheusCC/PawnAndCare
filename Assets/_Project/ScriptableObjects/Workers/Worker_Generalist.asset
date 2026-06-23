@@ -15,6 +15,10 @@ MonoBehaviour:
   role: 0
   baseMoveSpeed: 5
   baseServiceSpeed: 1
-  skillRatings: []
+  skillRatings:
+  - serviceType: 0
+    rating: 0.5
+  - serviceType: 1
+    rating: 0.5
   hireCost: 100
   dailySalary: 50

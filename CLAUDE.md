@@ -14,6 +14,8 @@
 
 Avoid vague names (`temp`), abbreviations, and negated names (`notSuccessful`).
 
+**`Manager` suffix ⟹ singleton.** Only name a class `…Manager` if it is a `Singleton<T>`. Non-singleton classes take a role/thing name instead (e.g. `StaffDirector`, `ReceptionQueue`, `CustomerSpawner`). One-directional: a singleton may have a non-`Manager` name (e.g. `ReceptionQueue`, `ServiceDispatcher`), but a `…Manager` must always be a singleton.
+
 ### Code Standards
 
 - **Allman braces:** Always on new line, always use braces (even single-line `if`)

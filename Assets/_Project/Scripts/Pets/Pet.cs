@@ -75,15 +75,19 @@ namespace PawsAndCare.Pets
         /// </summary>
         public bool HasReachedDestination()
         {
+            const float ARRIVAL_SPEED_SQR_THRESHOLD = 0.01f;
             bool reached = false;
 
-            if (navMeshAgent != null)
+            // Wait for the path to finish computing, then count "within stoppingDistance and
+            // effectively stopped" as arrived. We must NOT require hasPath: Unity clears it the instant
+            // the agent finishes (or when avoidance parks it at the spot), which would otherwise leave
+            // an agent that physically arrived reporting "not arrived" forever — deadlocking the
+            // service handshake.
+            if (navMeshAgent != null && navMeshAgent.isOnNavMesh && !navMeshAgent.pathPending)
             {
-                if (navMeshAgent.isOnNavMesh && navMeshAgent.hasPath)
+                if (navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance)
                 {
-                    // Agent stops within its stoppingDistance — exact arrival is impossible
-                    // due to agent radius and float-precision drift on the final approach.
-                    reached = navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance;
+                    reached = !navMeshAgent.hasPath || navMeshAgent.velocity.sqrMagnitude <= ARRIVAL_SPEED_SQR_THRESHOLD;
                 }
             }
 

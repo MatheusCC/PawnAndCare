@@ -67,5 +67,20 @@ namespace PawsAndCare.Workers
 
             return result;
         }
+
+        /// <summary>
+        /// Sums the daily salary of every registered worker — the payroll owed at day end.
+        /// </summary>
+        public float GetDailyPayroll()
+        {
+            float total = 0.0f;
+
+            for (int i = 0; i < registeredWorkers.Count; i++)
+            {
+                total += registeredWorkers[i].Worker.GetDailySalary();
+            }
+
+            return total;
+        }
     }
 }
