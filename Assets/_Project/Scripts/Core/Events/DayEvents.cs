@@ -63,4 +63,30 @@ namespace PawsAndCare.Core
             this.currentPhase = currentPhase;
         }
     }
+
+    /// <summary>
+    /// Published by DayManager when the in-game clock advances to a new minute (not every frame), so
+    /// clock displays can update event-driven without per-frame polling.
+    /// </summary>
+    public readonly struct GameMinuteChangedEvent
+    {
+        private readonly int hour;
+        private readonly int minute;
+
+        public int Hour
+        {
+            get { return hour; }
+        }
+
+        public int Minute
+        {
+            get { return minute; }
+        }
+
+        public GameMinuteChangedEvent(int hour, int minute)
+        {
+            this.hour = hour;
+            this.minute = minute;
+        }
+    }
 }

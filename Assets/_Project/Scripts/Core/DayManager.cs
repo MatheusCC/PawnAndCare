@@ -56,6 +56,7 @@ namespace PawsAndCare.Core
         private bool isPaused;
         private bool isAcceptingCustomers;
         private float beatTimer;
+        private int lastPublishedMinuteOfDay;
 
         public int CurrentDay
         {
@@ -92,6 +93,7 @@ namespace PawsAndCare.Core
             isPaused = false;
             isAcceptingCustomers = false;
             beatTimer = 0.0f;
+            lastPublishedMinuteOfDay = -1;
         }
 
         /// <summary>
@@ -167,10 +169,12 @@ namespace PawsAndCare.Core
             if (currentTime >= closingHour)
             {
                 currentTime = closingHour;
+                PublishTimeIfChanged();
                 EnterPhase(DayPhase.CLOSED);
             }
             else
             {
+                PublishTimeIfChanged();
                 DayPhase derived = DerivePhase(currentTime);
 
                 if (derived != currentPhase)
@@ -196,6 +200,7 @@ namespace PawsAndCare.Core
         {
             currentTime = openingHour;
             EventBus.Publish(new DayStartedEvent(currentDay));
+            PublishTimeIfChanged();
             EnterPhase(DayPhase.PRE_OPEN);
         }
 
@@ -242,6 +247,21 @@ namespace PawsAndCare.Core
             bool open = phase == DayPhase.MORNING || phase == DayPhase.MIDDAY || phase == DayPhase.AFTERNOON;
 
             return open;
+        }
+
+        // Publishes GameMinuteChangedEvent only when the displayed minute actually rolls over, so the
+        // clock UI updates per in-game minute rather than per frame. No allocation unless it fires.
+        private void PublishTimeIfChanged()
+        {
+            int hour = Mathf.FloorToInt(currentTime);
+            int minute = Mathf.FloorToInt((currentTime - hour) * MINUTES_PER_HOUR);
+            int minuteOfDay = (hour * (int)MINUTES_PER_HOUR) + minute;
+
+            if (minuteOfDay != lastPublishedMinuteOfDay)
+            {
+                lastPublishedMinuteOfDay = minuteOfDay;
+                EventBus.Publish(new GameMinuteChangedEvent(hour, minute));
+            }
         }
     }
 }
