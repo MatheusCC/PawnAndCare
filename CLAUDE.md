@@ -77,7 +77,7 @@ You MAY ONLY access these specific folders:
 1. `Assets/_Project/Scripts/`
 2. `Assets/_Project/Scenes/`
 3. `ProjectSettings/`
-4. Root-level files: `README.md`, `claude.md`, `.gitignore`, `Phase1_Tasks` `Phase2_Tasks` `Phase3_Tasks`
+4. Root-level files: `README.md`, `claude.md`, `.gitignore`, `Phase1_Tasks` `Phase2_Tasks` `Phase3_Tasks` `Phase4_Tasks`
 5. `Assets/_Project/Prefabs/`
 6. `Docs/`
 

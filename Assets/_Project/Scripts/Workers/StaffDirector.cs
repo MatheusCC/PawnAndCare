@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using PawsAndCare.Core;
 using PawsAndCare.Economy;
@@ -9,15 +10,44 @@ namespace PawsAndCare.Workers
     /// globally, it only reacts to events and the hire panel). Grows a worker's skill each time it
     /// completes a service, pays daily salaries at day end, and hires new workers on demand. Skill
     /// growth feeds service quality and reputation; salaries make the economy a real
-    /// income-vs-payroll loop.
+    /// income-vs-payroll loop. The hire UI reads HireOptions and calls TryHire.
     /// </summary>
     public class StaffDirector : MonoBehaviour
     {
-        private const float HIRE_PANEL_X = 10.0f;
-        private const float HIRE_PANEL_Y = 90.0f;
-        private const float HIRE_BUTTON_WIDTH = 220.0f;
-        private const float HIRE_BUTTON_HEIGHT = 28.0f;
-        private const float HIRE_BUTTON_GAP = 4.0f;
+        /// <summary>A hireable worker option surfaced to the UI: what it is and what it costs.</summary>
+        public readonly struct HireOption
+        {
+            private readonly WorkerRole role;
+            private readonly float hireCost;
+            private readonly bool isValid;
+
+            public WorkerRole Role
+            {
+                get { return role; }
+            }
+
+            public float HireCost
+            {
+                get { return hireCost; }
+            }
+
+            /// <summary>
+            /// True only for options built through the constructor. A mis-authored prefab (missing
+            /// Worker component) leaves the default struct in the array — invalid, so the UI skips it
+            /// and TryHire refuses it instead of hiring a broken worker for free.
+            /// </summary>
+            public bool IsValid
+            {
+                get { return isValid; }
+            }
+
+            public HireOption(WorkerRole role, float hireCost)
+            {
+                this.role = role;
+                this.hireCost = hireCost;
+                this.isValid = true;
+            }
+        }
 
         [SerializeField]
         [Range(0.0f, 0.5f)]
@@ -32,13 +62,19 @@ namespace PawsAndCare.Workers
         [Tooltip("Where hired workers appear. Must sit on the NavMesh.")]
         private Transform hireSpawnPoint = null;
 
-        // Cached Worker components off the hireable prefabs, so the debug panel reads role/cost
-        // without a per-frame GetComponent.
-        private Worker[] hireablePreviews;
+        // Immutable role/cost snapshot of each hireable prefab, so the UI reads it without a
+        // per-frame GetComponent. Index-aligned with hireablePrefabs.
+        private HireOption[] hireOptions;
+
+        /// <summary>The hireable options, index-aligned with TryHire's index parameter.</summary>
+        public IReadOnlyList<HireOption> HireOptions
+        {
+            get { return hireOptions; }
+        }
 
         private void Awake()
         {
-            CacheHireablePreviews();
+            CacheHireOptions();
             EventBus.Subscribe<ServiceCompletedEvent>(OnServiceCompleted);
             EventBus.Subscribe<DayEndedEvent>(OnDayEnded);
         }
@@ -74,64 +110,59 @@ namespace PawsAndCare.Workers
             }
         }
 
-        // Temporary debug hire panel — clicking a button hires that worker if affordable. The real
-        // hiring UI replaces this in the polish pass.
-        private void OnGUI()
+        /// <summary>
+        /// Hires the candidate at the given index if it is valid and affordable: charges the hire cost
+        /// and spawns the worker (which self-registers with WorkerManager on Start). Validated before
+        /// charging so we never bill without placing the worker. Returns true on success.
+        /// </summary>
+        public bool TryHire(int index)
         {
-            float y = HIRE_PANEL_Y;
+            bool hired = false;
 
-            for (int i = 0; i < hireablePreviews.Length; i++)
+            if (index >= 0 && index < hireOptions.Length && hireOptions[index].IsValid && hireablePrefabs[index] != null)
             {
-                Worker preview = hireablePreviews[i];
+                float hireCost = hireOptions[index].HireCost;
+                bool affordable = EconomyManager.Instance != null && EconomyManager.Instance.Balance >= hireCost;
 
-                if (preview != null)
+                if (affordable && hireSpawnPoint != null)
                 {
-                    Rect rect = new Rect(HIRE_PANEL_X, y, HIRE_BUTTON_WIDTH, HIRE_BUTTON_HEIGHT);
-
-                    if (GUI.Button(rect, $"Hire {preview.Role}  (${preview.GetHireCost():0})"))
-                    {
-                        TryHire(hireablePrefabs[i], preview.GetHireCost());
-                    }
-
-                    y += HIRE_BUTTON_HEIGHT + HIRE_BUTTON_GAP;
+                    EventBus.Publish(new ExpenseIncurredEvent(hireCost, ExpenseType.HIRING));
+                    Instantiate(hireablePrefabs[index], hireSpawnPoint.position, Quaternion.identity, transform);
+                    hired = true;
+                }
+                else if (hireSpawnPoint == null)
+                {
+                    Debug.LogError("[StaffDirector] hireSpawnPoint is missing — cannot place a hired worker. Assign one in the inspector.", this);
                 }
             }
+
+            return hired;
         }
 
-        private void CacheHireablePreviews()
+        // Snapshots each hireable prefab's role + cost off its Worker component once at boot.
+        private void CacheHireOptions()
         {
             if (hireablePrefabs != null)
             {
-                hireablePreviews = new Worker[hireablePrefabs.Length];
+                hireOptions = new HireOption[hireablePrefabs.Length];
 
                 for (int i = 0; i < hireablePrefabs.Length; i++)
                 {
-                    if (hireablePrefabs[i] != null)
+                    Worker preview = hireablePrefabs[i] != null ? hireablePrefabs[i].GetComponent<Worker>() : null;
+
+                    if (preview != null)
                     {
-                        hireablePreviews[i] = hireablePrefabs[i].GetComponent<Worker>();
+                        hireOptions[i] = new HireOption(preview.Role, preview.GetHireCost());
+                    }
+                    else
+                    {
+                        Debug.LogError($"[StaffDirector] hireablePrefabs[{i}] is missing or has no Worker component.", this);
                     }
                 }
             }
             else
             {
-                hireablePreviews = new Worker[0];
-            }
-        }
-
-        // Charges the hire cost and spawns the worker (which self-registers with WorkerManager on
-        // Start). Validated before charging so we never bill without placing the worker.
-        private void TryHire(GameObject workerPrefab, float hireCost)
-        {
-            bool affordable = EconomyManager.Instance != null && EconomyManager.Instance.Balance >= hireCost;
-
-            if (affordable && hireSpawnPoint != null)
-            {
-                EventBus.Publish(new ExpenseIncurredEvent(hireCost, ExpenseType.HIRING));
-                Instantiate(workerPrefab, hireSpawnPoint.position, Quaternion.identity, transform);
-            }
-            else if (hireSpawnPoint == null)
-            {
-                Debug.LogError("[StaffDirector] hireSpawnPoint is missing — cannot place a hired worker. Assign one in the inspector.", this);
+                hireOptions = new HireOption[0];
             }
         }
     }
