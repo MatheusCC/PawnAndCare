@@ -1,6 +1,6 @@
 # Paws & Care — Phase 4: The Chaos System
 
-> **Renumbered:** formerly Phase 3. The Progression & Expansion slice (now `Phase3_Tasks.md`) was pulled ahead of Chaos — it activates reputation/grid/economy as a growth loop and gives the §8.4 chaos-prevention upgrades a purchase/building system to hook into.
+> **Renumbered:** formerly Phase 3. The Facility Building & Expansion slice (now `Phase3_Tasks.md`) was pulled ahead of Chaos — it activates the grid/reputation/economy as a growth loop and gives the §8.4 chaos-prevention upgrades a purchase/building system to hook into.
 
 **Phase goal:** Give the smoothly-running Phase 2 business its *personality*. Add the **Chaos system** — the signature "controlled chaos" that makes this "Two Point Hospital with pets" — with the **3 MVP events** (Dog Escape, Wet Shake, Bark Chain), an evaluate → trigger → escalate → resolve lifecycle, player response via 3D interaction + staff dispatch, and reputation/economy consequences.
 
