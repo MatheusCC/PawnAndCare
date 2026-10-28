@@ -5,12 +5,9 @@ using PawsAndCare.Workers;
 
 namespace PawsAndCare.Player
 {
-    /// <summary>
-    /// Scene-level player input router. Left-click on a Worker selects it (visual only for now).
-    /// In the Phase 2 auto-assign model, ServiceDispatcher drives workers to stations, so the player
-    /// no longer issues move or station-assign orders here — manual worker control returns as a
-    /// later milestone. This class only tracks the current selection.
-    /// </summary>
+    // Scene-level player input router. Left-click on a Worker selects it (visual only).
+    // ServiceDispatcher drives workers to stations, so this class issues no move or
+    // station-assign orders — it only tracks the current selection.
     public class AgentController : MonoBehaviour
     {
         [SerializeField]

@@ -3,12 +3,10 @@ using UnityEngine;
 
 namespace PawsAndCare.Building
 {
-    /// <summary>
-    /// Scene-placed marker that registers its GameObject as a room with the GridSystem at boot. Attach
-    /// to a room's floor; the room's cells are derived from that floor's world bounds — you size the
-    /// floor visually and the cells follow, so there are no grid coordinates to hand-author. Only the
-    /// RoomType is set here.
-    /// </summary>
+    // Scene-placed marker that registers its GameObject as a room with the GridSystem at boot. Attach
+    // to a room's floor; the room's cells are derived from that floor's world bounds — you size the
+    // floor visually and the cells follow, so there are no grid coordinates to hand-author. Only the
+    // RoomType is set here.
     public class RoomMarker : MonoBehaviour
     {
         [SerializeField]
@@ -19,10 +17,8 @@ namespace PawsAndCare.Building
             get { return roomType; }
         }
 
-        /// <summary>
-        /// Returns the grid cells this room covers, derived from the floor's world bounds via the grid.
-        /// Empty if the floor has no renderers to measure.
-        /// </summary>
+        // Returns the grid cells this room covers, derived from the floor's world bounds via the grid.
+        // Empty if the floor has no renderers to measure.
         public List<Vector2Int> GetCells(GridSystem grid)
         {
             List<Vector2Int> cells;

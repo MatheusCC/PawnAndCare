@@ -5,11 +5,9 @@ using PawsAndCare.Input;
 
 namespace PawsAndCare.Interaction
 {
-    /// <summary>
-    /// Manages interactive entity hover detection and selection. Per-frame raycasts detect hover state
-    /// changes and fire OnHoverEnter/OnHoverExit callbacks on IInteractable. Clicks route to
-    /// IInteractable.OnSelect() if applicable. Filters interactions based on the current InteractionMode.
-    /// </summary>
+    // Manages interactive entity hover detection and selection. Per-frame raycasts detect hover state
+    // changes and fire OnHoverEnter/OnHoverExit callbacks on IInteractable. Clicks route to
+    // IInteractable.OnSelect() if applicable. Filters interactions based on the current InteractionMode.
     public class InteractionManager : Singleton<InteractionManager>
     {
         [SerializeField]
@@ -25,9 +23,7 @@ namespace PawsAndCare.Interaction
         private Collider lastHitCollider;
         private IInteractable lastHitInteractable;
 
-        /// <summary>
-        /// The current interaction mode. Controls whether hover/click routing to IInteractable is allowed.
-        /// </summary>
+        // The current interaction mode. Controls whether hover/click routing to IInteractable is allowed.
         public InteractionMode CurrentMode
         {
             get { return currentMode; }
@@ -145,9 +141,7 @@ namespace PawsAndCare.Interaction
             }
         }
 
-        /// <summary>
-        /// Sets the current interaction mode. Modes other than NORMAL block hover/click routing to interactables.
-        /// </summary>
+        // Sets the current interaction mode. Modes other than NORMAL block hover/click routing to interactables.
         public void SetInteractionMode(InteractionMode mode)
         {
             currentMode = mode;

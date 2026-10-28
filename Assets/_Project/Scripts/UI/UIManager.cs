@@ -3,12 +3,10 @@ using PawsAndCare.Core;
 
 namespace PawsAndCare.UI
 {
-    /// <summary>
-    /// Owns which panels are open and the single pause state that follows from them. A panel opens/
-    /// closes through here so the day cycle is frozen while any open panel wants it paused and resumes
-    /// only once none do. Single-scene for now — panels are scene objects, so this holds no cross-scene
-    /// references beyond the current scene's lifetime.
-    /// </summary>
+    // Owns which panels are open and the single pause state that follows from them. A panel opens/
+    // closes through here so the day cycle is frozen while any open panel wants it paused and resumes
+    // only once none do. Single-scene for now — panels are scene objects, so this holds no cross-scene
+    // references beyond the current scene's lifetime.
     public class UIManager : Singleton<UIManager>
     {
         private List<UIPanel> openPanels;
@@ -18,7 +16,7 @@ namespace PawsAndCare.UI
             openPanels = new List<UIPanel>();
         }
 
-        /// <summary>Shows the panel and updates the pause state. No-op if it is already open.</summary>
+        // Shows the panel and updates the pause state. No-op if it is already open.
         public void OpenPanel(UIPanel panel)
         {
             if (panel != null && !openPanels.Contains(panel))
@@ -29,7 +27,7 @@ namespace PawsAndCare.UI
             }
         }
 
-        /// <summary>Hides the panel and updates the pause state. No-op if it was not open.</summary>
+        // Hides the panel and updates the pause state. No-op if it was not open.
         public void ClosePanel(UIPanel panel)
         {
             if (panel != null && openPanels.Remove(panel))
@@ -39,7 +37,7 @@ namespace PawsAndCare.UI
             }
         }
 
-        /// <summary>Closes every open panel (e.g. on a hard state change) and resumes time.</summary>
+        // Closes every open panel (e.g. on a hard state change) and resumes time.
         public void CloseAll()
         {
             for (int i = openPanels.Count - 1; i >= 0; i--)

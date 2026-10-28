@@ -2,12 +2,10 @@ using UnityEngine;
 
 namespace PawsAndCare.Building
 {
-    /// <summary>
-    /// Static template for a placeable object (station, furniture, or decoration): what it is, what it
-    /// costs, how many grid cells it occupies, and the gates on it. The catalog reads these to build
-    /// its entries; build mode reads the footprint/prefab to preview and place. Runtime placement state
-    /// (which cells it sits on) lives on the placed instance's GridFootprint, not here.
-    /// </summary>
+    // Static template for a placeable object (station, furniture, or decoration): what it is, what it
+    // costs, how many grid cells it occupies, and the gates on it. The catalog reads these to build
+    // its entries; build mode reads the footprint/prefab to preview and place. Runtime placement state
+    // (which cells it sits on) lives on the placed instance's GridFootprint, not here.
     [CreateAssetMenu(fileName = "Blueprint_", menuName = "PawsAndCare/Building/Blueprint")]
     public class Blueprint : ScriptableObject
     {
@@ -66,7 +64,7 @@ namespace PawsAndCare.Building
             get { return cost; }
         }
 
-        /// <summary>Footprint in grid cells, clamped to a minimum of 1x1 so a mis-authored asset never spans zero cells.</summary>
+        // Footprint in grid cells, clamped to a minimum of 1x1 so a mis-authored asset never spans zero cells.
         public Vector2Int Footprint
         {
             get { return new Vector2Int(Mathf.Max(MIN_FOOTPRINT_CELLS, footprint.x), Mathf.Max(MIN_FOOTPRINT_CELLS, footprint.y)); }

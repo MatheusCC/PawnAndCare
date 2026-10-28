@@ -4,12 +4,10 @@ using PawsAndCare.Core;
 
 namespace PawsAndCare.UI
 {
-    /// <summary>
-    /// Spawns floating feedback popups from the deltas the economy and reputation systems already
-    /// emit: a gain/loss pops near the matching status-bar element and rises away. Popups are pooled
-    /// (reused, not destroyed) to avoid per-spawn allocation. Event-driven — nothing runs per frame
-    /// here. Lives on its own (popup) canvas.
-    /// </summary>
+    // Spawns floating feedback popups from the deltas the economy and reputation systems already
+    // emit: a gain/loss pops near the matching status-bar element and rises away. Popups are pooled
+    // (reused, not destroyed) to avoid per-spawn allocation. Event-driven — nothing runs per frame
+    // here. Lives on its own (popup) canvas.
     public class FloatingPopupSpawner : MonoBehaviour
     {
         private const int DEFAULT_POOL_CAPACITY = 10;

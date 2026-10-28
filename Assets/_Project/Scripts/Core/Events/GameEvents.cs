@@ -1,8 +1,6 @@
 namespace PawsAndCare.Core
 {
-    /// <summary>
-    /// Published whenever GameManager transitions between game states.
-    /// </summary>
+    // Published whenever GameManager transitions between game states.
     public readonly struct GameStateChangedEvent
     {
         private readonly GameState oldState;

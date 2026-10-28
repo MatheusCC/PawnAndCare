@@ -5,12 +5,9 @@ using PawsAndCare.Interaction;
 
 namespace PawsAndCare.Services
 {
-    /// <summary>
-    /// A station where a Worker performs a service. Configuration (service type, name,
-    /// duration, price) is sourced from the assigned ServiceData. Tracks runtime
-    /// occupancy and physical condition. Self-registers with StationManager.
-    /// </summary>
-    [RequireComponent(typeof(MeshRenderer))]
+    // A station where a Worker performs a service. Configuration (service type, name,
+    // duration, price) is sourced from the assigned ServiceData. Tracks runtime
+    // occupancy and physical condition. Self-registers with StationManager.
     public class ServiceStation : MonoBehaviour, IInteractable
     {
         [SerializeField]
@@ -22,7 +19,7 @@ namespace PawsAndCare.Services
         private Transform workerAnchor = null;
 
         [SerializeField]
-        [Tooltip("World-space anchor where the customer pet should stand/sit to receive the service.")]
+        [Tooltip("Seat on top of the station. The pet walks up beside it, then is placed here (position + rotation) for the service.")]
         private Transform customerAnchor = null;
 
         [SerializeField]
@@ -49,13 +46,14 @@ namespace PawsAndCare.Services
         [Tooltip("Optional. Filled Image whose fillAmount goes 0 (empty) to 1 (full) as the service progresses. Set its Image Type to Filled.")]
         private Image progressFill = null;
 
-        private MeshRenderer targetRenderer = null;
+        private Renderer[] targetRenderers;
 
-        // Two cached material arrays so hover/exit just swaps a reference instead of allocating each time.
-        // defaultMaterials = the renderer's authored materials at boot.
-        // highlightedMaterials = defaultMaterials with outlineMaterial appended at the end.
-        private Material[] defaultMaterials = null;
-        private Material[] highlightedMaterials = null;
+        // Per-renderer cached material arrays, index-aligned with targetRenderers, so hover/exit just
+        // swaps references instead of allocating each time.
+        // defaultMaterials[i] = renderer i's authored materials at boot.
+        // highlightedMaterials[i] = defaultMaterials[i] with outlineMaterial appended at the end.
+        private Material[][] defaultMaterials;
+        private Material[][] highlightedMaterials;
 
         public ServiceData Data
         {
@@ -87,40 +85,35 @@ namespace PawsAndCare.Services
             get { return interactableType; }
         }
 
-        // Build the cached material arrays once at boot. defaultMaterials snapshots the renderer's
-        // authored materials; highlightedMaterials is the same list with outlineMaterial appended.
-        // Hover toggling becomes a single sharedMaterials assignment instead of per-frame array work.
+        // Collects every renderer in the station's hierarchy (the station is built from child meshes)
+        // and builds the cached hover material arrays once at boot.
         private void Awake()
         {
-            targetRenderer = GetComponent<MeshRenderer>();
+            targetRenderers = GetComponentsInChildren<Renderer>();
 
-            if (targetRenderer != null)
+            if (targetRenderers.Length > 0)
             {
                 BuildHighlightMaterials();
             }
             else
             {
-                Debug.LogWarning("[ServiceStation] No MeshRenderer found on this GameObject — hover highlight will not work.", this);
+                Debug.LogWarning("[ServiceStation] No Renderer found on this station or its children — hover highlight will not work.", this);
             }
         }
 
-        // Snapshots the renderer's authored materials (defaultMaterials) and the same list with
-        // outlineMaterial appended (highlightedMaterials), so hover toggling is a single
-        // sharedMaterials assignment instead of per-frame array work.
+        // Snapshots each renderer's authored materials and a copy with outlineMaterial appended.
         private void BuildHighlightMaterials()
         {
             if (outlineMaterial != null)
             {
-                defaultMaterials = targetRenderer.sharedMaterials;
+                defaultMaterials = new Material[targetRenderers.Length][];
+                highlightedMaterials = new Material[targetRenderers.Length][];
 
-                highlightedMaterials = new Material[defaultMaterials.Length + 1];
-
-                for (int i = 0; i < defaultMaterials.Length; i++)
+                for (int i = 0; i < targetRenderers.Length; i++)
                 {
-                    highlightedMaterials[i] = defaultMaterials[i];
+                    defaultMaterials[i] = targetRenderers[i].sharedMaterials;
+                    highlightedMaterials[i] = AppendOutline(defaultMaterials[i]);
                 }
-
-                highlightedMaterials[defaultMaterials.Length] = outlineMaterial;
             }
             else
             {
@@ -168,9 +161,7 @@ namespace PawsAndCare.Services
             }
         }
 
-        /// <summary>
-        /// Returns true if this station can perform the given service type.
-        /// </summary>
+        // Returns true if this station can perform the given service type.
         public bool Supports(ServiceType type)
         {
             bool supported = false;
@@ -188,18 +179,14 @@ namespace PawsAndCare.Services
             return !isOccupied && serviceData != null;
         }
 
-        /// <summary>
-        /// Sets occupancy. Owned by WorkerServiceRunner: reserved (true) when a worker is dispatched
-        /// here, released (false) on cancellation or service completion. Drives CanInteract/availability.
-        /// </summary>
+        // Sets occupancy. Owned by WorkerServiceRunner: reserved (true) when a worker is dispatched
+        // here, released (false) on cancellation or service completion. Drives CanInteract/availability.
         public void SetOccupied(bool occupied)
         {
             isOccupied = occupied;
         }
 
-        /// <summary>
-        /// Shows the progress bar (if assigned) and sets its fill to the given normalized value.
-        /// </summary>
+        // Shows the progress bar (if assigned) and sets its fill to the given normalized value.
         public void ShowServiceProgress(float normalized)
         {
             if (progressBarRoot != null)
@@ -213,9 +200,7 @@ namespace PawsAndCare.Services
             }
         }
 
-        /// <summary>
-        /// Hides the progress bar (if assigned).
-        /// </summary>
+        // Hides the progress bar (if assigned).
         public void HideServiceProgress()
         {
             if (progressBarRoot != null)
@@ -224,20 +209,40 @@ namespace PawsAndCare.Services
             }
         }
 
+        private Material[] AppendOutline(Material[] materials)
+        {
+            Material[] result = new Material[materials.Length + 1];
+
+            for (int i = 0; i < materials.Length; i++)
+            {
+                result[i] = materials[i];
+            }
+
+            result[materials.Length] = outlineMaterial;
+
+            return result;
+        }
+
+        // Assigns each renderer its cached material set. No-op if the sets were never built.
+        private void ApplyMaterials(Material[][] materialSets)
+        {
+            if (materialSets != null)
+            {
+                for (int i = 0; i < targetRenderers.Length; i++)
+                {
+                    targetRenderers[i].sharedMaterials = materialSets[i];
+                }
+            }
+        }
+
         public void OnHoverEnter()
         {
-            if (targetRenderer != null && highlightedMaterials != null)
-            {
-                targetRenderer.sharedMaterials = highlightedMaterials;
-            }
+            ApplyMaterials(highlightedMaterials);
         }
 
         public void OnHoverExit()
         {
-            if (targetRenderer != null && defaultMaterials != null)
-            {
-                targetRenderer.sharedMaterials = defaultMaterials;
-            }
+            ApplyMaterials(defaultMaterials);
         }
 
         // Reachable only when CanInteract() is true (the interaction layer gates it), so a selected

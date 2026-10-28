@@ -5,10 +5,8 @@ using PawsAndCare.Input;
 
 namespace PawsAndCare.Camera
 {
-    /// <summary>
-    /// Isometric camera controller: WASD/arrow pan, middle-mouse drag, scroll zoom,
-    /// Q/E snap rotation, optional edge-pan, auto pan-bounds from GridSystem.
-    /// </summary>
+    // Isometric camera controller: WASD/arrow pan, middle-mouse drag, scroll zoom,
+    // Q/E snap rotation, optional edge-pan, auto pan-bounds from GridSystem.
     // Namespace note: PawsAndCare.Camera shadows UnityEngine.Camera. Use the fully
     // qualified UnityEngine.Camera when referring to the Camera component type.
     //
@@ -105,17 +103,13 @@ namespace PawsAndCare.Camera
         // facility area regardless of which input drove the pan.
         private Rect panBounds;
 
-        /// <summary>
-        /// Instantiates the generated InputActions wrapper.
-        /// </summary>
+        // Instantiates the generated InputActions wrapper.
         private void Awake()
         {
             input = new CameraInputActions();
         }
 
-        /// <summary>
-        /// Activates the Camera action map and subscribes to event-driven actions.
-        /// </summary>
+        // Activates the Camera action map and subscribes to event-driven actions.
         private void OnEnable()
         {
             input.Camera.Enable();
@@ -127,9 +121,7 @@ namespace PawsAndCare.Camera
             input.Camera.Drag.canceled += OnDragCanceled;
         }
 
-        /// <summary>
-        /// Unsubscribes and disables the action map (mirror of OnEnable).
-        /// </summary>
+        // Unsubscribes and disables the action map (mirror of OnEnable).
         private void OnDisable()
         {
             input.Camera.RotateLeft.performed -= OnRotateLeft;
@@ -139,9 +131,7 @@ namespace PawsAndCare.Camera
             input.Camera.Disable();
         }
 
-        /// <summary>
-        /// Snapshots initial transform state into targets and computes pan bounds.
-        /// </summary>
+        // Snapshots initial transform state into targets and computes pan bounds.
         private void Start()
         {
             // Seed targets to current values so the first frame's SmoothDamp has
@@ -178,9 +168,7 @@ namespace PawsAndCare.Camera
             ComputePanBounds();
         }
 
-        /// <summary>
-        /// Read input → clamp targets to bounds → smooth toward targets, once per frame.
-        /// </summary>
+        // Read input → clamp targets to bounds → smooth toward targets, once per frame.
         private void Update()
         {
             // Clamping before smoothing means the rig eases to a valid position,
@@ -193,9 +181,7 @@ namespace PawsAndCare.Camera
             ApplySmoothing();
         }
 
-        /// <summary>
-        /// Builds the pan-bounds rect from the GridSystem's world extent.
-        /// </summary>
+        // Builds the pan-bounds rect from the GridSystem's world extent.
         private void ComputePanBounds()
         {
             if (gridSystem != null)
@@ -209,9 +195,7 @@ namespace PawsAndCare.Camera
             }
         }
 
-        /// <summary>
-        /// Reads the Pan vector and adds a camera-relative delta to targetRigPosition.
-        /// </summary>
+        // Reads the Pan vector and adds a camera-relative delta to targetRigPosition.
         private void HandleKeyboardPan()
         {
             Vector2 panInput = input.Camera.Pan.ReadValue<Vector2>();
@@ -233,9 +217,7 @@ namespace PawsAndCare.Camera
             }
         }
 
-        /// <summary>
-        /// While middle-mouse is held, drags the rig so the world follows the cursor.
-        /// </summary>
+        // While middle-mouse is held, drags the rig so the world follows the cursor.
         private void HandleMouseDrag()
         {
             if (isDragging)
@@ -263,9 +245,7 @@ namespace PawsAndCare.Camera
             }
         }
 
-        /// <summary>
-        /// Pans the camera when the cursor sits near a screen edge (only when edgePanEnabled is true).
-        /// </summary>
+        // Pans the camera when the cursor sits near a screen edge (only when edgePanEnabled is true).
         private void HandleEdgePan()
         {
             if (edgePanEnabled)
@@ -289,10 +269,8 @@ namespace PawsAndCare.Camera
             }
         }
 
-        /// <summary>
-        /// True when the cursor sits inside the game window. Guards against an alt-tabbed
-        /// user returning to a camera that drifted while the OS reported an off-screen cursor.
-        /// </summary>
+        // True when the cursor sits inside the game window. Guards against an alt-tabbed
+        // user returning to a camera that drifted while the OS reported an off-screen cursor.
         private bool IsCursorOnScreen(Vector2 pointerPos)
         {
             return pointerPos.x >= 0.0f
@@ -301,10 +279,8 @@ namespace PawsAndCare.Camera
                 && pointerPos.y <= Screen.height;
         }
 
-        /// <summary>
-        /// Returns a -1/0/1 per-axis vector marking which edge(s) the cursor is hugging.
-        /// Same shape as the WASD Pan action so it feeds straight into the pan math.
-        /// </summary>
+        // Returns a -1/0/1 per-axis vector marking which edge(s) the cursor is hugging.
+        // Same shape as the WASD Pan action so it feeds straight into the pan math.
         private Vector2 GetEdgePanDirection(Vector2 pointerPos)
         {
             Vector2 edgeInput = Vector2.zero;
@@ -333,9 +309,7 @@ namespace PawsAndCare.Camera
             return edgeInput;
         }
 
-        /// <summary>
-        /// Adds a camera-relative, zoom-scaled edge-pan delta to the target rig position.
-        /// </summary>
+        // Adds a camera-relative, zoom-scaled edge-pan delta to the target rig position.
         private void ApplyEdgePan(Vector2 edgeInput)
         {
             // Same camera-relative pattern as HandleKeyboardPan:
@@ -350,9 +324,7 @@ namespace PawsAndCare.Camera
             targetRigPosition += worldDirection * edgePanSpeed * zoomScale * Time.deltaTime;
         }
 
-        /// <summary>
-        /// Adjusts targetZoom by the scroll input, clamped to [zoomMin, zoomMax].
-        /// </summary>
+        // Adjusts targetZoom by the scroll input, clamped to [zoomMin, zoomMax].
         private void HandleZoom()
         {
             float scrollInput = input.Camera.Zoom.ReadValue<float>();
@@ -365,9 +337,7 @@ namespace PawsAndCare.Camera
             }
         }
 
-        /// <summary>
-        /// Clamps targetRigPosition X/Z to panBounds (no-op without a GridSystem reference).
-        /// </summary>
+        // Clamps targetRigPosition X/Z to panBounds (no-op without a GridSystem reference).
         private void ClampTargetToBounds()
         {
             if (gridSystem != null)
@@ -378,9 +348,7 @@ namespace PawsAndCare.Camera
             }
         }
 
-        /// <summary>
-        /// Eases current transform values toward their targets via SmoothDamp.
-        /// </summary>
+        // Eases current transform values toward their targets via SmoothDamp.
         private void ApplySmoothing()
         {
             // SmoothDamp is acceleration-based — accelerates toward the target and
@@ -402,9 +370,7 @@ namespace PawsAndCare.Camera
             cameraPivot.localRotation = Quaternion.Euler(0.0f, currentYRotation, 0.0f);
         }
 
-        /// <summary>
-        /// Q → schedule a 90° left rotation of the world view.
-        /// </summary>
+        // Q → schedule a 90° left rotation of the world view.
         private void OnRotateLeft(InputAction.CallbackContext ctx)
         {
             // Q rotates the WORLD left. Camera spins clockwise around Y (+90°),
@@ -412,34 +378,26 @@ namespace PawsAndCare.Camera
             targetYRotation += ROTATION_STEP_DEGREES;
         }
 
-        /// <summary>
-        /// E → schedule a 90° right rotation of the world view.
-        /// </summary>
+        // E → schedule a 90° right rotation of the world view.
         private void OnRotateRight(InputAction.CallbackContext ctx)
         {
             targetYRotation -= ROTATION_STEP_DEGREES;
         }
 
-        /// <summary>
-        /// Middle-mouse pressed → start a drag and snapshot the cursor for delta tracking.
-        /// </summary>
+        // Middle-mouse pressed → start a drag and snapshot the cursor for delta tracking.
         private void OnDragStarted(InputAction.CallbackContext ctx)
         {
             lastPointerPosition = input.Camera.PointerPosition.ReadValue<Vector2>();
             isDragging = true;
         }
 
-        /// <summary>
-        /// Middle-mouse released → stop the drag.
-        /// </summary>
+        // Middle-mouse released → stop the drag.
         private void OnDragCanceled(InputAction.CallbackContext ctx)
         {
             isDragging = false;
         }
 
-        /// <summary>
-        /// Moves the camera target to the X/Z of worldPosition (smoothed via SmoothDamp).
-        /// </summary>
+        // Moves the camera target to the X/Z of worldPosition (smoothed via SmoothDamp).
         public void FocusOn(Vector3 worldPosition)
         {
             // Preserve current Y — we only reposition in the XZ plane. Smoothing
@@ -447,9 +405,7 @@ namespace PawsAndCare.Camera
             targetRigPosition = new Vector3(worldPosition.x, targetRigPosition.y, worldPosition.z);
         }
 
-        /// <summary>
-        /// Draws the pan-bounds rect as a cyan wire frame at grid ground level.
-        /// </summary>
+        // Draws the pan-bounds rect as a cyan wire frame at grid ground level.
         private void OnDrawGizmos()
         {
             // Compute bounds from gridSystem each call so it works in edit mode

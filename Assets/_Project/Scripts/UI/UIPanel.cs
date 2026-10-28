@@ -2,12 +2,10 @@ using UnityEngine;
 
 namespace PawsAndCare.UI
 {
-    /// <summary>
-    /// Base class for a full-screen/modal uGUI panel (hire screen, day-end summary, pause menu, …).
-    /// Visibility is driven through a CanvasGroup so the object stays alive for fade tweens later.
-    /// Open()/Close() route through the UIManager so it can own the pause + stacking bookkeeping in
-    /// one place; subclasses populate their content in the OnShow/OnHide hooks.
-    /// </summary>
+    // Base class for a full-screen/modal uGUI panel (hire screen, day-end summary, pause menu, …).
+    // Visibility is driven through a CanvasGroup so the object stays alive for fade tweens later.
+    // Open()/Close() route through the UIManager so it can own the pause + stacking bookkeeping in
+    // one place; subclasses populate their content in the OnShow/OnHide hooks.
     [RequireComponent(typeof(CanvasGroup))]
     public abstract class UIPanel : MonoBehaviour
     {
@@ -17,13 +15,13 @@ namespace PawsAndCare.UI
 
         private CanvasGroup canvasGroup;
 
-        /// <summary>Whether this panel should freeze the day cycle while open.</summary>
+        // Whether this panel should freeze the day cycle while open.
         public bool PausesGame
         {
             get { return pausesGame; }
         }
 
-        /// <summary>Whether this panel is currently open.</summary>
+        // Whether this panel is currently open.
         public bool IsOpen { get; private set; }
 
         protected virtual void Awake()
@@ -48,7 +46,7 @@ namespace PawsAndCare.UI
             }
         }
 
-        /// <summary>Opens this panel through the UIManager (which handles pause + stacking).</summary>
+        // Opens this panel through the UIManager (which handles pause + stacking).
         public void Open()
         {
             if (UIManager.Instance != null)
@@ -61,7 +59,7 @@ namespace PawsAndCare.UI
             }
         }
 
-        /// <summary>Closes this panel through the UIManager.</summary>
+        // Closes this panel through the UIManager.
         public void Close()
         {
             if (UIManager.Instance != null)
@@ -104,10 +102,10 @@ namespace PawsAndCare.UI
             }
         }
 
-        /// <summary>Hook for subclasses to build/refresh content when the panel opens.</summary>
+        // Hook for subclasses to build/refresh content when the panel opens.
         protected virtual void OnShow() { }
 
-        /// <summary>Hook for subclasses to release/reset content when the panel closes.</summary>
+        // Hook for subclasses to release/reset content when the panel closes.
         protected virtual void OnHide() { }
     }
 }

@@ -7,11 +7,9 @@ using PawsAndCare.Workers;
 
 namespace PawsAndCare.UI
 {
-    /// <summary>
-    /// One hireable candidate shown in the hire panel: its role and cost with a Hire button. Purely
-    /// presentational — it reports its index back to the owning HireScreen on click and toggles its own
-    /// affordability; it holds no economy or staff logic.
-    /// </summary>
+    // One hireable candidate shown in the hire panel: its role and cost with a Hire button. Purely
+    // presentational — it reports its index back to the owning HireScreen on click and toggles its own
+    // affordability; it holds no economy or staff logic.
     public class HireCandidate : MonoBehaviour
     {
         [SerializeField]
@@ -29,19 +27,15 @@ namespace PawsAndCare.UI
         private int optionIndex;
         private Action<int> onHire;
 
-        /// <summary>
-        /// Index of the StaffDirector hire option this candidate represents. The HireScreen uses it to
-        /// look the option back up (rows and options are not index-aligned — invalid options get no row).
-        /// </summary>
+        // Index of the StaffDirector hire option this candidate represents. The HireScreen uses it to
+        // look the option back up (rows and options are not index-aligned — invalid options get no row).
         public int OptionIndex
         {
             get { return optionIndex; }
         }
 
-        /// <summary>
-        /// Binds this candidate to a hire option. onHire is invoked with the option's index when the
-        /// button is clicked. Safe to call again to rebind (listeners are reset first).
-        /// </summary>
+        // Binds this candidate to a hire option. onHire is invoked with the option's index when the
+        // button is clicked. Safe to call again to rebind (listeners are reset first).
         public void Setup(int index, WorkerRole role, float hireCost, Action<int> onHire)
         {
             optionIndex = index;
@@ -68,7 +62,7 @@ namespace PawsAndCare.UI
             }
         }
 
-        /// <summary>Greys the button out when the player cannot afford this candidate.</summary>
+        // Greys the button out when the player cannot afford this candidate.
         public void SetAffordable(bool affordable)
         {
             if (hireButton != null)

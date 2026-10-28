@@ -5,12 +5,10 @@ using PawsAndCare.Pets;
 
 namespace PawsAndCare.Services
 {
-    /// <summary>
-    /// Ordered waiting line for arriving pets. Assigns each pet a physical slot, ticks its
-    /// patience while it waits, advances the line as pets leave (dispatched into service or
-    /// timed out), and answers front-of-queue queries for ServiceDispatcher (Task 5).
-    /// Owns the queue-wait patience so PetStateMachine stays primitive-driven and decoupled.
-    /// </summary>
+    // Ordered waiting line for arriving pets. Assigns each pet a physical slot, ticks its
+    // patience while it waits, advances the line as pets leave (dispatched into service or
+    // timed out), and answers front-of-queue queries for ServiceDispatcher.
+    // Owns the queue-wait patience so PetStateMachine stays primitive-driven and decoupled.
     public class ReceptionQueue : Singleton<ReceptionQueue>
     {
         [SerializeField]
@@ -54,10 +52,8 @@ namespace PawsAndCare.Services
             }
         }
 
-        /// <summary>
-        /// Adds a pet to the back of the line and sends it to that slot. Returns false when the
-        /// queue is full, so the caller can turn the pet away.
-        /// </summary>
+        // Adds a pet to the back of the line and sends it to that slot. Returns false when the
+        // queue is full, so the caller can turn the pet away.
         public bool TryEnqueue(PetStateMachine pet)
         {
             bool enqueued = false;
@@ -74,10 +70,8 @@ namespace PawsAndCare.Services
             return enqueued;
         }
 
-        /// <summary>
-        /// Removes a pet (dispatched into service or left on timeout) and shifts everyone
-        /// behind it one slot forward.
-        /// </summary>
+        // Removes a pet (dispatched into service or left on timeout) and shifts everyone
+        // behind it one slot forward.
         public void Remove(PetStateMachine pet, QueueLeaveReason reason)
         {
             int index = IndexOf(pet);
@@ -90,9 +84,7 @@ namespace PawsAndCare.Services
             }
         }
 
-        /// <summary>
-        /// Front-to-back scan for the dispatcher: first waiting pet wanting this service, or null.
-        /// </summary>
+        // Front-to-back scan for the dispatcher: first waiting pet wanting this service, or null.
         public PetStateMachine PeekNextForService(ServiceType type)
         {
             PetStateMachine result = null;

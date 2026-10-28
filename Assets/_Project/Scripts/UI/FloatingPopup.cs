@@ -4,12 +4,10 @@ using TMPro;
 
 namespace PawsAndCare.UI
 {
-    /// <summary>
-    /// A single feedback popup (e.g. "+$25", "-3 rep") that drifts and fades. On finishing it raises
-    /// the onComplete callback so the owner (a pool) can recycle it — the popup never deactivates or
-    /// destroys itself, so the pool's active/inactive bookkeeping stays correct. Lives on its own
-    /// canvas so its per-frame animation doesn't rebuild the status-bar batch.
-    /// </summary>
+    // A single feedback popup (e.g. "+$25", "-3 rep") that drifts and fades. On finishing it raises
+    // the onComplete callback so the owner (a pool) can recycle it — the popup never deactivates or
+    // destroys itself, so the pool's active/inactive bookkeeping stays correct. Lives on its own
+    // canvas so its per-frame animation doesn't rebuild the status-bar batch.
     [RequireComponent(typeof(CanvasGroup))]
     public class FloatingPopup : MonoBehaviour
     {
@@ -42,11 +40,9 @@ namespace PawsAndCare.UI
             rectTransform = (RectTransform)transform;
         }
 
-        /// <summary>
-        /// Sets the popup's text/color and starts the drift/fade. onComplete is invoked when it
-        /// finishes — the owner uses it to release the popup back to its pool. The popup never
-        /// deactivates or destroys itself.
-        /// </summary>
+        // Sets the popup's text/color and starts the drift/fade. onComplete is invoked when it
+        // finishes — the owner uses it to release the popup back to its pool. The popup never
+        // deactivates or destroys itself.
         public void Play(string text, Color color, Action<FloatingPopup> onComplete)
         {
             this.onComplete = onComplete;

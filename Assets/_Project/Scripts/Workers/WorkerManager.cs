@@ -5,10 +5,8 @@ using PawsAndCare.Services;
 
 namespace PawsAndCare.Workers
 {
-    /// <summary>
-    /// Tracks every live WorkerServiceRunner in the scene and answers availability queries for the
-    /// ServiceDispatcher. Workers self-register on Start and unregister on destroy. Mirrors StationManager.
-    /// </summary>
+    // Tracks every live WorkerServiceRunner in the scene and answers availability queries for the
+    // ServiceDispatcher. Workers self-register on Start and unregister on destroy. Mirrors StationManager.
     public class WorkerManager : Singleton<WorkerManager>
     {
         private List<WorkerServiceRunner> registeredWorkers;
@@ -18,9 +16,7 @@ namespace PawsAndCare.Workers
             registeredWorkers = new List<WorkerServiceRunner>();
         }
 
-        /// <summary>
-        /// Adds a worker to the registry. Called by WorkerServiceRunner.Start.
-        /// </summary>
+        // Adds a worker to the registry. Called by WorkerServiceRunner.Start.
         public void Register(WorkerServiceRunner worker)
         {
             if (worker != null && !registeredWorkers.Contains(worker))
@@ -29,9 +25,7 @@ namespace PawsAndCare.Workers
             }
         }
 
-        /// <summary>
-        /// Removes a worker from the registry. Called by WorkerServiceRunner.OnDestroy.
-        /// </summary>
+        // Removes a worker from the registry. Called by WorkerServiceRunner.OnDestroy.
         public void Unregister(WorkerServiceRunner worker)
         {
             if (worker != null)
@@ -40,10 +34,8 @@ namespace PawsAndCare.Workers
             }
         }
 
-        /// <summary>
-        /// Returns the free worker with the highest skill for the given service type, or null if none
-        /// is available — so the best-suited idle worker takes the job.
-        /// </summary>
+        // Returns the free worker with the highest skill for the given service type, or null if none
+        // is available — so the best-suited idle worker takes the job.
         public WorkerServiceRunner GetAvailableWorker(ServiceType type)
         {
             // Linear scan ranked by skill: worker count is tiny, so picking the max in one pass
@@ -68,9 +60,7 @@ namespace PawsAndCare.Workers
             return result;
         }
 
-        /// <summary>
-        /// Sums the daily salary of every registered worker — the payroll owed at day end.
-        /// </summary>
+        // Sums the daily salary of every registered worker — the payroll owed at day end.
         public float GetDailyPayroll()
         {
             float total = 0.0f;

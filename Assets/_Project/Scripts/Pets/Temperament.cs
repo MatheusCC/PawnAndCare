@@ -1,8 +1,6 @@
 namespace PawsAndCare.Pets
 {
-    /// <summary>
-    /// Behavioral disposition of a pet. Data only for now; affects service difficulty/quality in a later milestone.
-    /// </summary>
+    // Behavioral disposition of a pet. Data only for now; affects service difficulty/quality in a later milestone.
     public enum Temperament
     {
         CALM = 0,

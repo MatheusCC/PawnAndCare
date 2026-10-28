@@ -2,11 +2,9 @@ using UnityEngine;
 
 namespace PawsAndCare.Core
 {
-    /// <summary>
-    /// Generic singleton base class for persistent manager systems.
-    /// Inherit from this to get a scene-persistent, globally accessible instance.
-    /// Usage: public class MyManager : Singleton&lt;MyManager&gt;
-    /// </summary>
+    // Generic singleton base class for persistent manager systems.
+    // Inherit from this to get a scene-persistent, globally accessible instance.
+    // Usage: public class MyManager : Singleton<MyManager>
     public abstract class Singleton<T> : MonoBehaviour where T : Singleton<T>
     {
         public static T Instance { get; private set; }
@@ -25,10 +23,8 @@ namespace PawsAndCare.Core
             }
         }
 
-        /// <summary>
-        /// Called once after the singleton instance is established.
-        /// Override in subclasses to run setup logic instead of using Awake.
-        /// </summary>
+        // Called once after the singleton instance is established.
+        // Override in subclasses to run setup logic instead of using Awake.
         protected virtual void OnInitialize() { }
 
         // Clears the static Instance when this singleton is destroyed (including on play-mode stop).

@@ -1,9 +1,7 @@
 namespace PawsAndCare.Core
 {
-    /// <summary>
-    /// Published by ReputationManager whenever the reputation score changes. Delta is the signed
-    /// change applied (positive for good reviews, negative for turn-aways or poor service).
-    /// </summary>
+    // Published by ReputationManager whenever the reputation score changes. Delta is the signed
+    // change applied (positive for good reviews, negative for turn-aways or poor service).
     public readonly struct ReputationChangedEvent
     {
         private readonly float newReputation;

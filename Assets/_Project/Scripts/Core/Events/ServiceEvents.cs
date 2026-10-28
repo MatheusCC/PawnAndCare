@@ -2,9 +2,7 @@ using PawsAndCare.Services;
 
 namespace PawsAndCare.Core
 {
-    /// <summary>
-    /// Published by ServiceManager when a new service session begins.
-    /// </summary>
+    // Published by ServiceManager when a new service session begins.
     public readonly struct ServiceStartedEvent
     {
         private readonly ServiceSession session;
@@ -20,9 +18,7 @@ namespace PawsAndCare.Core
         }
     }
 
-    /// <summary>
-    /// Published by ServiceManager when a service session reaches completion.
-    /// </summary>
+    // Published by ServiceManager when a service session reaches completion.
     public readonly struct ServiceCompletedEvent
     {
         private readonly ServiceSession session;

@@ -3,17 +3,15 @@ using UnityEngine;
 
 namespace PawsAndCare.Building
 {
-    /// <summary>
-    /// Owns the 2D grid of cells used for placement, room assignment, and pathfinding. The grid is
-    /// built AROUND the authored lot floor: its origin, width, and height are derived from that floor's
-    /// world bounds so nothing is sized by hand — you author the floor in world space and the grid
-    /// discretizes it at cellSize granularity. Coordinates: grid (x, y) maps to world (X, Z) relative
-    /// to the derived Origin (the floor's min corner); cell centers are offset by cellSize/2.
-    /// </summary>
+    // Owns the 2D grid of cells used for placement, room assignment, and pathfinding. The grid is
+    // built AROUND the authored lot floor: its origin, width, and height are derived from that floor's
+    // world bounds so nothing is sized by hand — you author the floor in world space and the grid
+    // discretizes it at cellSize granularity. Coordinates: grid (x, y) maps to world (X, Z) relative
+    // to the derived Origin (the floor's min corner); cell centers are offset by cellSize/2.
     public class GridSystem : MonoBehaviour
     {
         [SerializeField]
-        [Tooltip("World units per cell. TDD §12.1: 1 metre per cell.")]
+        [Tooltip("World units per cell (default 1 metre).")]
         private float cellSize = 1.0f;
 
         [SerializeField]
@@ -42,7 +40,7 @@ namespace PawsAndCare.Building
         public float CellSize { get { return cellSize; } }
         public List<Room> Rooms { get { return rooms; } }
 
-        /// <summary>World-space min corner of the grid (the lot floor's min X/Z at its surface Y).</summary>
+        // World-space min corner of the grid (the lot floor's min X/Z at its surface Y).
         public Vector3 Origin
         {
             get
@@ -141,9 +139,7 @@ namespace PawsAndCare.Building
             }
         }
 
-        /// <summary>
-        /// Returns the cell at the given grid position, or null if out of bounds or before the grid is built.
-        /// </summary>
+        // Returns the cell at the given grid position, or null if out of bounds or before the grid is built.
         public GridCell GetCell(Vector2Int position)
         {
             GridCell result = null;
@@ -156,9 +152,7 @@ namespace PawsAndCare.Building
             return result;
         }
 
-        /// <summary>
-        /// Converts a grid coordinate to the world-space center of that cell.
-        /// </summary>
+        // Converts a grid coordinate to the world-space center of that cell.
         public Vector3 GridToWorld(Vector2Int gridPos)
         {
             Vector3 origin = Origin;
@@ -169,10 +163,8 @@ namespace PawsAndCare.Building
             return new Vector3(worldX, origin.y, worldZ);
         }
 
-        /// <summary>
-        /// Converts a world position to the grid coordinate it falls within.
-        /// May return out-of-bounds coordinates; use GetCell for safe lookup.
-        /// </summary>
+        // Converts a world position to the grid coordinate it falls within.
+        // May return out-of-bounds coordinates; use GetCell for safe lookup.
         public Vector2Int WorldToGrid(Vector3 worldPos)
         {
             Vector3 origin = Origin;
@@ -183,9 +175,7 @@ namespace PawsAndCare.Building
             return new Vector2Int(gridX, gridY);
         }
 
-        /// <summary>
-        /// True when the cell exists and is not occupied.
-        /// </summary>
+        // True when the cell exists and is not occupied.
         public bool IsCellAvailable(Vector2Int position)
         {
             GridCell cell = GetCell(position);
@@ -195,10 +185,8 @@ namespace PawsAndCare.Building
             return available;
         }
 
-        /// <summary>
-        /// True when every cell of a footprint (origin plus size in cells) is available. Used by
-        /// placement to validate a multi-cell object before committing.
-        /// </summary>
+        // True when every cell of a footprint (origin plus size in cells) is available. Used by
+        // placement to validate a multi-cell object before committing.
         public bool AreCellsAvailable(Vector2Int origin, Vector2Int footprint)
         {
             bool available = true;
@@ -217,11 +205,9 @@ namespace PawsAndCare.Building
             return available;
         }
 
-        /// <summary>
-        /// Returns the world-AABB-derived cells a world rectangle covers, clamped to the grid. Lets
-        /// scene objects (rooms, placed items) claim cells from their world bounds without hand-typed
-        /// coordinates.
-        /// </summary>
+        // Returns the world-AABB-derived cells a world rectangle covers, clamped to the grid. Lets
+        // scene objects (rooms, placed items) claim cells from their world bounds without hand-typed
+        // coordinates.
         public List<Vector2Int> GetCellsInBounds(Bounds worldBounds)
         {
             List<Vector2Int> covered = new List<Vector2Int>();
@@ -245,11 +231,9 @@ namespace PawsAndCare.Building
             return covered;
         }
 
-        /// <summary>
-        /// Creates a new room of the given type and assigns the listed cells to it.
-        /// Cells that are out of bounds or already assigned to another room are
-        /// skipped with a warning. Returns the created Room.
-        /// </summary>
+        // Creates a new room of the given type and assigns the listed cells to it.
+        // Cells that are out of bounds or already assigned to another room are
+        // skipped with a warning. Returns the created Room.
         public Room CreateRoom(RoomType type, List<Vector2Int> cellsToAssign)
         {
             Room room = new Room(nextRoomId, type);
@@ -282,9 +266,7 @@ namespace PawsAndCare.Building
             return room;
         }
 
-        /// <summary>
-        /// Returns the room with the given ID, or null if not found.
-        /// </summary>
+        // Returns the room with the given ID, or null if not found.
         public Room GetRoomById(int id)
         {
             Room result = null;

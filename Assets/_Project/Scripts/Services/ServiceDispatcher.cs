@@ -6,17 +6,15 @@ using PawsAndCare.Workers;
 
 namespace PawsAndCare.Services
 {
-    /// <summary>
-    /// Auto-assign brain for the customer loop (Phase 2 Task 5). Owns the convergence handshake that
-    /// no single actor can: it seats arriving pets at free stations, dispatches free workers to
-    /// staffed stations, starts the ServiceSession once both the pet and worker have arrived, mirrors
-    /// progress, and releases everyone on completion.
-    ///
-    /// Model: a pet is seated at a free station the moment it arrives (reserving it); it only waits in
-    /// the ReceptionQueue when no station is free. A worker is sent to a station as soon as one has a
-    /// pet but no worker. When a service completes, the freed station immediately pulls the
-    /// longest-waiting matching pet out of the queue.
-    /// </summary>
+    // Auto-assign brain for the customer loop . Owns the convergence handshake that
+    // no single actor can: it seats arriving pets at free stations, dispatches free workers to
+    // staffed stations, starts the ServiceSession once both the pet and worker have arrived, mirrors
+    // progress, and releases everyone on completion.
+    //
+    // Model: a pet is seated at a free station the moment it arrives (reserving it); it only waits in
+    // the ReceptionQueue when no station is free. A worker is sent to a station as soon as one has a
+    // pet but no worker. When a service completes, the freed station immediately pulls the
+    // longest-waiting matching pet out of the queue.
     public class ServiceDispatcher : Singleton<ServiceDispatcher>
     {
         private List<ServiceJob> jobs;
@@ -26,11 +24,9 @@ namespace PawsAndCare.Services
             jobs = new List<ServiceJob>();
         }
 
-        /// <summary>
-        /// Intake (Task 5): seat the pet at a free station if one supports its service, otherwise put
-        /// it in the reception queue. Returns false when no station is free and the queue is full, so
-        /// the spawner can turn the pet away.
-        /// </summary>
+        // Intake: seat the pet at a free station if one supports its service, otherwise put
+        // it in the reception queue. Returns false when no station is free and the queue is full, so
+        // the spawner can turn the pet away.
         public bool AdmitPet(PetStateMachine pet)
         {
             bool admitted = false;
@@ -180,7 +176,7 @@ namespace PawsAndCare.Services
             }
         }
 
-        // Reserves the station and sends the pet to it. The pet waits at the customer anchor until a
+        // Reserves the station and sends the pet to it. The pet sits on the customer anchor until a
         // worker arrives and the session starts.
         private void SeatPet(ServiceStation station, PetStateMachine pet)
         {
@@ -189,7 +185,7 @@ namespace PawsAndCare.Services
 
             if (station.CustomerAnchor != null)
             {
-                pet.SendToStation(station.CustomerAnchor.position);
+                pet.SendToStation(station.CustomerAnchor);
             }
             else
             {

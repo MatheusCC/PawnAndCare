@@ -12,10 +12,8 @@ namespace PawsAndCare.Core
         LOADING = 3
     }
 
-    /// <summary>
-    /// Central authority for the game's high-level state and boot sequence.
-    /// Owns the GameState lifecycle and orchestrates ordered system startup.
-    /// </summary>
+    // Central authority for the game's high-level state and boot sequence.
+    // Owns the GameState lifecycle and orchestrates ordered system startup.
     public class GameManager : Singleton<GameManager>
     {
         [SerializeField]
@@ -86,9 +84,7 @@ namespace PawsAndCare.Core
             ChangeState(GameState.PLAYING);
         }
 
-        /// <summary>
-        /// Transitions the game to a new state. Same-state calls are ignored.
-        /// </summary>
+        // Transitions the game to a new state. Same-state calls are ignored.
         public void ChangeState(GameState newState)
         {
             if (newState != currentState)

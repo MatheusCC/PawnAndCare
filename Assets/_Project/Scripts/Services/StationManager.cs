@@ -4,10 +4,8 @@ using PawsAndCare.Core;
 
 namespace PawsAndCare.Services
 {
-    /// <summary>
-    /// Tracks every live ServiceStation in the scene and answers availability queries.
-    /// Stations self-register on Start and unregister on destroy.
-    /// </summary>
+    // Tracks every live ServiceStation in the scene and answers availability queries.
+    // Stations self-register on Start and unregister on destroy.
     public class StationManager : Singleton<StationManager>
     {
         private List<ServiceStation> registeredStations;
@@ -17,9 +15,7 @@ namespace PawsAndCare.Services
             registeredStations = new List<ServiceStation>();
         }
 
-        /// <summary>
-        /// Adds a station to the registry. Called by ServiceStation.Start.
-        /// </summary>
+        // Adds a station to the registry. Called by ServiceStation.Start.
         public void Register(ServiceStation station)
         {
             if (station != null && !registeredStations.Contains(station))
@@ -28,9 +24,7 @@ namespace PawsAndCare.Services
             }
         }
 
-        /// <summary>
-        /// Removes a station from the registry. Called by ServiceStation.OnDestroy.
-        /// </summary>
+        // Removes a station from the registry. Called by ServiceStation.OnDestroy.
         public void Unregister(ServiceStation station)
         {
             if (station != null)
@@ -39,12 +33,10 @@ namespace PawsAndCare.Services
             }
         }
 
-        /// <summary>
-        /// Returns the first unoccupied station that supports the given service type, or null if none.
-        /// </summary>
+        // Returns the first unoccupied station that supports the given service type, or null if none.
         public ServiceStation GetAvailableStation(ServiceType type)
         {
-            // Linear scan: station count in Phase 1 is tiny (≤ ~10), so a per-type cached lookup
+            // Linear scan: station count is small (≤ ~10), so a per-type cached lookup
             // would add complexity without measurable benefit. Revisit if profiling shows hot spot.
             ServiceStation result = null;
 

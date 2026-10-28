@@ -2,13 +2,11 @@ using UnityEngine;
 
 namespace PawsAndCare.Core
 {
-    /// <summary>
-    /// Owns the flow of in-game time and the day cycle. Time is not real-time: it advances at
-    /// gameMinutesPerRealSecond (scaled by timeScale). Each day runs a short PreOpen beat, then the
-    /// clock runs openingHour → closingHour through Morning/Midday/Afternoon/Closing, then a Closed
-    /// beat before auto-rolling to the next day. Phase transitions and day boundaries are broadcast
-    /// over the EventBus so other systems (spawning, economy) stay decoupled.
-    /// </summary>
+    // Owns the flow of in-game time and the day cycle. Time is not real-time: it advances at
+    // gameMinutesPerRealSecond (scaled by timeScale). Each day runs a short PreOpen beat, then the
+    // clock runs openingHour → closingHour through Morning/Midday/Afternoon/Closing, then a Closed
+    // beat before auto-rolling to the next day. Phase transitions and day boundaries are broadcast
+    // over the EventBus so other systems (spawning, economy) stay decoupled.
     public class DayManager : Singleton<DayManager>
     {
         private const float MINUTES_PER_HOUR = 60.0f;
@@ -96,9 +94,7 @@ namespace PawsAndCare.Core
             lastPublishedMinuteOfDay = -1;
         }
 
-        /// <summary>
-        /// Starts the day cycle at day 1. Called by GameManager.BootGame once the facility/NavMesh exist.
-        /// </summary>
+        // Starts the day cycle at day 1. Called by GameManager.BootGame once the facility/NavMesh exist.
         public void BeginDayCycle()
         {
             currentDay = 1;
@@ -106,17 +102,13 @@ namespace PawsAndCare.Core
             StartDay();
         }
 
-        /// <summary>
-        /// Pauses or resumes the flow of time (e.g. the pause menu). Phase logic is frozen while paused.
-        /// </summary>
+        // Pauses or resumes the flow of time (e.g. the pause menu). Phase logic is frozen while paused.
         public void SetPaused(bool paused)
         {
             isPaused = paused;
         }
 
-        /// <summary>
-        /// Sets the time-progression multiplier (e.g. 1x / 2x / 3x). Values at or below zero are ignored.
-        /// </summary>
+        // Sets the time-progression multiplier (e.g. 1x / 2x / 3x). Values at or below zero are ignored.
         public void SetTimeScale(float scale)
         {
             if (scale > 0.0f)

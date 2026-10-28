@@ -4,16 +4,13 @@ using PawsAndCare.Services;
 
 namespace PawsAndCare.Pets
 {
-    /// <summary>
-    /// Spawns customer pets on a timer while the facility is accepting customers. Each spawn picks a
-    /// random pet prefab (each prefab carries its own PetDefinition), drops it at the entrance, records
-    /// its exit via BeginArrival, then admits it through the ServiceDispatcher (which seats it at a free
-    /// station or queues it). A pet that can't be placed at all is turned away straight to the exit.
-    ///
-    /// Spawning is gated by the day cycle: it runs only during DayManager's open phases
-    /// (Morning/Midday/Afternoon) and pauses otherwise, with a shorter interval during the Midday rush.
-    /// The full AnimationCurve wave system (TDD §9.2) is deferred to polish.
-    /// </summary>
+    // Spawns customer pets on a timer while the facility is accepting customers. Each spawn picks a
+    // random pet prefab (each prefab carries its own PetDefinition), drops it at the entrance, records
+    // its exit via BeginArrival, then admits it through the ServiceDispatcher (which seats it at a free
+    // station or queues it). A pet that can't be placed at all is turned away straight to the exit.
+    //
+    // Spawning is gated by the day cycle: it runs only during DayManager's open phases
+    // (Morning/Midday/Afternoon) and pauses otherwise, with a shorter interval during the Midday rush.
     public class CustomerSpawner : MonoBehaviour
     {
         [SerializeField]
@@ -124,7 +121,7 @@ namespace PawsAndCare.Pets
             spawnTimer = Random.Range(minSpawnInterval, maxSpawnInterval) * PhaseIntervalFactor();
         }
 
-        // Tighter spawn cadence during the Midday peak; full daily wave shaping is deferred (TDD §9.2).
+        // Tighter spawn cadence during the Midday peak.
         private float PhaseIntervalFactor()
         {
             float factor = 1.0f;

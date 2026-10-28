@@ -1,8 +1,6 @@
 namespace PawsAndCare.Pets
 {
-    /// <summary>
-    /// Lifecycle states of a customer pet, driven by PetStateMachine.
-    /// </summary>
+    // Lifecycle states of a customer pet, driven by PetStateMachine.
     public enum PetState
     {
         ARRIVING = 0,

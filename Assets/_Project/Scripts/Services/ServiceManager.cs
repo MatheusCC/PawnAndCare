@@ -6,11 +6,9 @@ using PawsAndCare.Workers;
 
 namespace PawsAndCare.Services
 {
-    /// <summary>
-    /// Owns the lifecycle of active ServiceSessions: creation, per-frame progress,
-    /// and completion broadcasting. Knows nothing about navigation or station occupancy —
-    /// those belong to WorkerServiceRunner. This manager only advances session math.
-    /// </summary>
+    // Owns the lifecycle of active ServiceSessions: creation, per-frame progress,
+    // and completion broadcasting. Knows nothing about navigation or station occupancy —
+    // those belong to WorkerServiceRunner. This manager only advances session math.
     public class ServiceManager : Singleton<ServiceManager>
     {
         private List<ServiceSession> activeSessions;
@@ -22,10 +20,8 @@ namespace PawsAndCare.Services
             nextSessionId = 1;
         }
 
-        /// <summary>
-        /// Creates and begins tracking a new session. Publishes ServiceStartedEvent.
-        /// Returns the created session, or null if any argument was invalid.
-        /// </summary>
+        // Creates and begins tracking a new session. Publishes ServiceStartedEvent.
+        // Returns the created session, or null if any argument was invalid.
         public ServiceSession StartService(ServiceStation station, ServiceData service, Worker worker, PetStateMachine pet)
         {
             ServiceSession session = null;

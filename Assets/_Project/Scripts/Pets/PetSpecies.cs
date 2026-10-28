@@ -1,8 +1,6 @@
 namespace PawsAndCare.Pets
 {
-    /// <summary>
-    /// Animal species of a customer pet. Append new values only (serialized).
-    /// </summary>
+    // Animal species of a customer pet. Append new values only (serialized).
     public enum PetSpecies
     {
         DOG = 0,

@@ -3,9 +3,7 @@ using PawsAndCare.Services;
 
 namespace PawsAndCare.Workers
 {
-    /// <summary>
-    /// Worker template data: role, speed, cost, and skill ratings per service type.
-    /// </summary>
+    // Worker template data: role, speed, cost, and skill ratings per service type.
     [CreateAssetMenu(fileName = "Worker_", menuName = "PawsAndCare/Workers/Worker Data")]
     public class WorkerData : ScriptableObject
     {
@@ -63,10 +61,8 @@ namespace PawsAndCare.Workers
             get { return dailySalary; }
         }
 
-        /// <summary>
-        /// Returns the worker's skill rating for the given service type, clamped to [0,1].
-        /// Returns 0 if no rating is defined for that service.
-        /// </summary>
+        // Returns the worker's skill rating for the given service type, clamped to [0,1].
+        // Returns 0 if no rating is defined for that service.
         public float GetSkillRating(ServiceType serviceType)
         {
             float rating = 0.0f;

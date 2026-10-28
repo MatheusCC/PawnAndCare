@@ -2,9 +2,7 @@ using UnityEngine;
 
 namespace PawsAndCare.Services
 {
-    /// <summary>
-    /// Service template: type, duration, price, and required station type.
-    /// </summary>
+    // Service template: type, duration, price, and required station type.
     [CreateAssetMenu(fileName = "Service_", menuName = "PawsAndCare/Services/Service Data")]
     public class ServiceData : ScriptableObject
     {

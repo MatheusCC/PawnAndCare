@@ -2,11 +2,9 @@ using UnityEngine;
 
 namespace PawsAndCare.Building
 {
-    /// <summary>
-    /// Single cell in the grid — owns its coordinate, occupancy, and room assignment.
-    /// Position is fixed at construction; mutate the rest via setters. (Pathfinding is owned by the
-    /// NavMesh, not the grid, so cells carry no walkability flag.)
-    /// </summary>
+    // Single cell in the grid — owns its coordinate, occupancy, and room assignment.
+    // Position is fixed at construction; mutate the rest via setters. (Pathfinding is owned by the
+    // NavMesh, not the grid, so cells carry no walkability flag.)
     public class GridCell
     {
         private readonly Vector2Int position;
@@ -27,18 +25,14 @@ namespace PawsAndCare.Building
             this.roomId = 0;
         }
 
-        /// <summary>
-        /// Sets the occupant. Pass null to free the cell.
-        /// </summary>
+        // Sets the occupant. Pass null to free the cell.
         public void SetOccupied(GameObject occupant)
         {
             occupiedBy = occupant;
             isOccupied = (occupant != null);
         }
 
-        /// <summary>
-        /// Assigns this cell to a room. Use 0 for "unassigned".
-        /// </summary>
+        // Assigns this cell to a room. Use 0 for "unassigned".
         public void SetRoomId(int newRoomId)
         {
             roomId = newRoomId;

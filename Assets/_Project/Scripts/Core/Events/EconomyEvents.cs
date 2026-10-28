@@ -2,11 +2,9 @@ using PawsAndCare.Economy;
 
 namespace PawsAndCare.Core
 {
-    /// <summary>
-    /// Published by EconomyManager whenever the running balance changes. Delta is the signed amount
-    /// applied (positive for revenue, negative for spending), so UI can show both the new total and
-    /// what just changed.
-    /// </summary>
+    // Published by EconomyManager whenever the running balance changes. Delta is the signed amount
+    // applied (positive for revenue, negative for spending), so UI can show both the new total and
+    // what just changed.
     public readonly struct BalanceChangedEvent
     {
         private readonly float newBalance;
@@ -29,10 +27,8 @@ namespace PawsAndCare.Core
         }
     }
 
-    /// <summary>
-    /// Published by systems that incur a business expense (e.g. StaffOffice payroll and hiring).
-    /// EconomyManager subscribes and deducts the amount, mirroring how it adds service revenue.
-    /// </summary>
+    // Published by systems that incur a business expense (e.g. StaffOffice payroll and hiring).
+    // EconomyManager subscribes and deducts the amount, mirroring how it adds service revenue.
     public readonly struct ExpenseIncurredEvent
     {
         private readonly float amount;

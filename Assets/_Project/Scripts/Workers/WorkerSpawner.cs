@@ -2,9 +2,7 @@ using UnityEngine;
 
 namespace PawsAndCare.Workers
 {
-    /// <summary>
-    /// Spawns worker instances from a prefab at designated positions during boot.
-    /// </summary>
+    // Spawns worker instances from a prefab at designated positions during boot.
     public class WorkerSpawner : MonoBehaviour
     {
         [SerializeField]
@@ -12,10 +10,8 @@ namespace PawsAndCare.Workers
         [SerializeField]
         private Transform spawnPosition = null;
 
-        /// <summary>
-        /// Instantiates the worker prefab at the configured spawn position.
-        /// Called by GameManager after the facility + NavMesh are built so the agent lands on a valid mesh.
-        /// </summary>
+        // Instantiates the worker prefab at the configured spawn position.
+        // Called by GameManager after the facility + NavMesh are built so the agent lands on a valid mesh.
         public void Spawn()
         {
             if (workerPrefab != null)

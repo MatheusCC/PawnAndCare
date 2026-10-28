@@ -1,8 +1,6 @@
 namespace PawsAndCare.Core
 {
-    /// <summary>
-    /// Published by DayManager when a new in-game day begins (start of its PreOpen phase).
-    /// </summary>
+    // Published by DayManager when a new in-game day begins (start of its PreOpen phase).
     public readonly struct DayStartedEvent
     {
         private readonly int dayNumber;
@@ -18,11 +16,9 @@ namespace PawsAndCare.Core
         }
     }
 
-    /// <summary>
-    /// Published by DayManager when the day's open hours end (it enters Closed). A pure day-boundary
-    /// signal — consumers read their own daily stats (e.g. EconomyManager.DailyRevenue) to build the
-    /// end-of-day summary, keeping DayManager decoupled from those feature systems.
-    /// </summary>
+    // Published by DayManager when the day's open hours end (it enters Closed). A pure day-boundary
+    // signal — consumers read their own daily stats (e.g. EconomyManager.DailyRevenue) to build the
+    // end-of-day summary, keeping DayManager decoupled from those feature systems.
     public readonly struct DayEndedEvent
     {
         private readonly int dayNumber;
@@ -38,10 +34,8 @@ namespace PawsAndCare.Core
         }
     }
 
-    /// <summary>
-    /// Published by DayManager on every day-phase transition. Systems gate behaviour on the new
-    /// phase (e.g. CustomerSpawner spawns only while customers are accepted).
-    /// </summary>
+    // Published by DayManager on every day-phase transition. Systems gate behaviour on the new
+    // phase (e.g. CustomerSpawner spawns only while customers are accepted).
     public readonly struct DayPhaseChangedEvent
     {
         private readonly DayPhase previousPhase;
@@ -64,10 +58,8 @@ namespace PawsAndCare.Core
         }
     }
 
-    /// <summary>
-    /// Published by DayManager when the in-game clock advances to a new minute (not every frame), so
-    /// clock displays can update event-driven without per-frame polling.
-    /// </summary>
+    // Published by DayManager when the in-game clock advances to a new minute (not every frame), so
+    // clock displays can update event-driven without per-frame polling.
     public readonly struct GameMinuteChangedEvent
     {
         private readonly int hour;

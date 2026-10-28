@@ -4,19 +4,15 @@ using UnityEngine;
 
 namespace PawsAndCare.Core
 {
-    /// <summary>
-    /// Static publish/subscribe event bus. Decouples systems by letting them
-    /// communicate through events without holding direct references.
-    /// </summary>
+    // Static publish/subscribe event bus. Decouples systems by letting them
+    // communicate through events without holding direct references.
     // Convention: event types are structs (zero-allocation publishing).
     public static class EventBus
     {
         private static readonly Dictionary<Type, List<Delegate>> handlers = new Dictionary<Type, List<Delegate>>();
 
-        /// <summary>
-        /// Registers a handler to be called whenever an event of type T is published.
-        /// Null handlers and duplicate subscriptions are silently ignored.
-        /// </summary>
+        // Registers a handler to be called whenever an event of type T is published.
+        // Null handlers and duplicate subscriptions are silently ignored.
         public static void Subscribe<T>(Action<T> handler)
         {
             if (handler != null)
@@ -36,9 +32,7 @@ namespace PawsAndCare.Core
             }
         }
 
-        /// <summary>
-        /// Removes a previously-registered handler. No-op if the handler was never subscribed.
-        /// </summary>
+        // Removes a previously-registered handler. No-op if the handler was never subscribed.
         public static void Unsubscribe<T>(Action<T> handler)
         {
             if (handler != null)
@@ -52,9 +46,7 @@ namespace PawsAndCare.Core
             }
         }
 
-        /// <summary>
-        /// Sends an event to all handlers subscribed to type T.
-        /// </summary>
+        // Sends an event to all handlers subscribed to type T.
         public static void Publish<T>(T eventData)
         {
             Type eventType = typeof(T);

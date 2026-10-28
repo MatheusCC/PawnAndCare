@@ -2,15 +2,13 @@ using UnityEngine;
 
 namespace PawsAndCare.Visuals
 {
-    /// <summary>
-    /// Keeps this object screen-aligned (always facing the camera) so flat visuals like
-    /// world-space progress bars stay readable as the isometric camera rotates. Works for
-    /// both a 3D quad and a World Space Canvas — both are just transforms to orient.
-    ///
-    /// Attach to the object that should face the camera (e.g. the progress bar root). When
-    /// that object is toggled inactive, LateUpdate stops running — so an idle station's bar
-    /// costs nothing.
-    /// </summary>
+    // Keeps this object screen-aligned (always facing the camera) so flat visuals like
+    // world-space progress bars stay readable as the isometric camera rotates. Works for
+    // both a 3D quad and a World Space Canvas — both are just transforms to orient.
+    //
+    // Attach to the object that should face the camera (e.g. the progress bar root). When
+    // that object is toggled inactive, LateUpdate stops running — so an idle station's bar
+    // costs nothing.
     public class CameraFacingBillboard : MonoBehaviour
     {
         [SerializeField]

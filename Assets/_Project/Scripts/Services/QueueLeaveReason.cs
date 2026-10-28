@@ -1,8 +1,6 @@
 namespace PawsAndCare.Services
 {
-    /// <summary>
-    /// Why a pet left the reception queue. Consumed by reputation (Task 9) and future UI.
-    /// </summary>
+    // Why a pet left the reception queue. Consumed by ReputationManager.
     public enum QueueLeaveReason
     {
         DISPATCHED = 0,   // pulled into service by ServiceDispatcher (good outcome)

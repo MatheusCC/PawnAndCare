@@ -1,11 +1,9 @@
 namespace PawsAndCare.Core
 {
-    /// <summary>
-    /// Phases of an in-game day, driven by DayManager. PreOpen is the between-days planning beat;
-    /// Morning/Midday/Afternoon are the open hours (customers accepted, wave intensity varies);
-    /// Closing stops accepting new customers while in-progress services finish; Closed triggers the
-    /// end-of-day summary.
-    /// </summary>
+    // Phases of an in-game day, driven by DayManager. PreOpen is the between-days planning beat;
+    // Morning/Midday/Afternoon are the open hours (customers accepted, wave intensity varies);
+    // Closing stops accepting new customers while in-progress services finish; Closed triggers the
+    // end-of-day summary.
     public enum DayPhase
     {
         PRE_OPEN = 0,

@@ -7,12 +7,10 @@ using PawsAndCare.Workers;
 
 namespace PawsAndCare.UI
 {
-    /// <summary>
-    /// The hire panel: lists the StaffDirector's hire options, one HireCandidate each, and hires on
-    /// click. Candidates are built once from the (static) option list; affordability is refreshed each
-    /// time the panel opens and whenever the balance changes while it is open — event-driven, no
-    /// per-frame work.
-    /// </summary>
+    // The hire panel: lists the StaffDirector's hire options, one HireCandidate each, and hires on
+    // click. Candidates are built once from the (static) option list; affordability is refreshed each
+    // time the panel opens and whenever the balance changes while it is open — event-driven, no
+    // per-frame work.
     public class HireScreen : UIPanel
     {
         [SerializeField]

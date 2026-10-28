@@ -5,9 +5,7 @@ using PawsAndCare.Services;
 
 namespace PawsAndCare.Workers
 {
-    /// <summary>
-    /// Player-controllable worker with NavMeshAgent-based pathfinding and movement.
-    /// </summary>
+    // Player-controllable worker with NavMeshAgent-based pathfinding and movement.
     [RequireComponent(typeof(NavMeshAgent))]
     public class Worker : MonoBehaviour
     {
@@ -25,17 +23,13 @@ namespace PawsAndCare.Workers
         // performs services (StaffDirector). The SO stays the immutable starting template.
         private Dictionary<ServiceType, float> runtimeSkill;
 
-        /// <summary>
-        /// Returns this worker's daily salary, or 0 if no data is assigned.
-        /// </summary>
+        // Returns this worker's daily salary, or 0 if no data is assigned.
         public float GetDailySalary()
         {
             return workerData != null ? workerData.DailySalary : 0.0f;
         }
 
-        /// <summary>
-        /// Returns this worker's one-time hire cost, or 0 if no data is assigned.
-        /// </summary>
+        // Returns this worker's one-time hire cost, or 0 if no data is assigned.
         public float GetHireCost()
         {
             return workerData != null ? workerData.HireCost : 0.0f;
@@ -77,10 +71,8 @@ namespace PawsAndCare.Workers
             }
         }
 
-        /// <summary>
-        /// Returns this worker's current (runtime) skill rating [0,1] for the given service type, or 0
-        /// if none is tracked.
-        /// </summary>
+        // Returns this worker's current (runtime) skill rating [0,1] for the given service type, or 0
+        // if none is tracked.
         public float GetSkillRating(ServiceType serviceType)
         {
             float rating;
@@ -89,10 +81,8 @@ namespace PawsAndCare.Workers
             return rating;
         }
 
-        /// <summary>
-        /// Improves this worker's skill in a service type by performing it, clamped to [0,1].
-        /// Called by StaffDirector on service completion.
-        /// </summary>
+        // Improves this worker's skill in a service type by performing it, clamped to [0,1].
+        // Called by StaffDirector on service completion.
         public void GainSkill(ServiceType serviceType, float amount)
         {
             float current;
@@ -100,9 +90,7 @@ namespace PawsAndCare.Workers
             runtimeSkill[serviceType] = Mathf.Clamp01(current + amount);
         }
 
-        /// <summary>
-        /// Toggles the selection indicator visual. Called by AgentController on selection change.
-        /// </summary>
+        // Toggles the selection indicator visual. Called by AgentController on selection change.
         public void SetSelectionIndicatorActive(bool selected)
         {
             if (selectionIndicator != null)
@@ -115,9 +103,7 @@ namespace PawsAndCare.Workers
             }
         }
 
-        /// <summary>
-        /// Commands the worker to move to a world position using NavMesh pathfinding.
-        /// </summary>
+        // Commands the worker to move to a world position using NavMesh pathfinding.
         public void MoveTo(Vector3 destination)
         {
             if (navMeshAgent != null && navMeshAgent.isOnNavMesh)
@@ -126,9 +112,7 @@ namespace PawsAndCare.Workers
             }
         }
 
-        /// <summary>
-        /// Returns true only when the worker has actually arrived at its destination.
-        /// </summary>
+        // Returns true only when the worker has actually arrived at its destination.
         public bool HasReachedDestination()
         {
             const float ARRIVAL_SPEED_SQR_THRESHOLD = 0.01f;

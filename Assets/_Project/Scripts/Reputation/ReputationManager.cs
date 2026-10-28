@@ -4,13 +4,11 @@ using PawsAndCare.Services;
 
 namespace PawsAndCare.Reputation
 {
-    /// <summary>
-    /// Owns the business's reputation score (0-100), the primary progression metric. Reacts to the
-    /// signals the customer loop already emits: a completed service leaves a 1-5 star review that
-    /// nudges reputation up or down from neutral, and a pet that gives up in the queue (a turn-away)
-    /// costs reputation. All changes funnel through ApplyDelta, which clamps and publishes
-    /// ReputationChangedEvent. Reputation-driven gameplay (customer tier, unlocks) is deferred.
-    /// </summary>
+    // Owns the business's reputation score (0-100), the primary progression metric. Reacts to the
+    // signals the customer loop already emits: a completed service leaves a 1-5 star review that
+    // nudges reputation up or down from neutral, and a pet that gives up in the queue (a turn-away)
+    // costs reputation. All changes funnel through ApplyDelta, which clamps and publishes
+    // ReputationChangedEvent.
     public class ReputationManager : Singleton<ReputationManager>
     {
         private const float MIN_REPUTATION = 0.0f;

@@ -3,9 +3,7 @@ using PawsAndCare.Services;
 
 namespace PawsAndCare.Core
 {
-    /// <summary>
-    /// Published by ReceptionQueue when a pet takes a queue slot. Reputation + future UI consume this.
-    /// </summary>
+    // Published by ReceptionQueue when a pet takes a queue slot. Reputation + future UI consume this.
     public readonly struct PetEnqueuedEvent
     {
         private readonly PetStateMachine pet;
@@ -28,9 +26,7 @@ namespace PawsAndCare.Core
         }
     }
 
-    /// <summary>
-    /// Published by ReceptionQueue when a pet leaves the line — pulled into service or timed out.
-    /// </summary>
+    // Published by ReceptionQueue when a pet leaves the line — pulled into service or timed out.
     public readonly struct PetLeftQueueEvent
     {
         private readonly PetStateMachine pet;

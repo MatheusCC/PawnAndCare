@@ -15,10 +15,8 @@ namespace PawsAndCare.Building
         STORAGE = 7
     }
 
-    /// <summary>
-    /// A logical grouping of grid cells — tracks its identifier, type, member cells,
-    /// and the objects placed within it.
-    /// </summary>
+    // A logical grouping of grid cells — tracks its identifier, type, member cells,
+    // and the objects placed within it.
     public class Room
     {
         private readonly int roomId;
@@ -39,34 +37,26 @@ namespace PawsAndCare.Building
             this.placedObjects = new List<GameObject>();
         }
 
-        /// <summary>
-        /// Adds a cell coordinate to this room's cell list.
-        /// Does not update GridSystem state — use GridSystem.CreateRoom or AddCellToRoom for that.
-        /// </summary>
+        // Adds a cell coordinate to this room's cell list.
+        // Does not update GridSystem state — use GridSystem.CreateRoom or AddCellToRoom for that.
         public void AddCell(Vector2Int cell)
         {
             cells.Add(cell);
         }
 
-        /// <summary>
-        /// Removes a cell coordinate from this room's cell list. No-op if not present.
-        /// </summary>
+        // Removes a cell coordinate from this room's cell list. No-op if not present.
         public void RemoveCell(Vector2Int cell)
         {
             cells.Remove(cell);
         }
 
-        /// <summary>
-        /// Tracks a placed object as belonging to this room.
-        /// </summary>
+        // Tracks a placed object as belonging to this room.
         public void AddPlacedObject(GameObject obj)
         {
             placedObjects.Add(obj);
         }
 
-        /// <summary>
-        /// Untracks a placed object from this room. No-op if not present.
-        /// </summary>
+        // Untracks a placed object from this room. No-op if not present.
         public void RemovePlacedObject(GameObject obj)
         {
             placedObjects.Remove(obj);

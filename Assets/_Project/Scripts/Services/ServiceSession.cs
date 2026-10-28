@@ -3,11 +3,9 @@ using PawsAndCare.Workers;
 
 namespace PawsAndCare.Services
 {
-    /// <summary>
-    /// One run of a service: which service, at which station, by which worker, for which pet.
-    /// Owns progress and the final quality result. Progress is advanced externally
-    /// (by ServiceManager) so the session itself stays a pure data + math object.
-    /// </summary>
+    // One run of a service: which service, at which station, by which worker, for which pet.
+    // Owns progress and the final quality result. Progress is advanced externally
+    // (by ServiceManager) so the session itself stays a pure data + math object.
     public class ServiceSession
     {
         // Quality at 0 skill is BASE_QUALITY * MIN_SKILL_QUALITY_FACTOR; at full skill it is BASE_QUALITY.
@@ -44,10 +42,8 @@ namespace PawsAndCare.Services
             status = ServiceStatus.IN_PROGRESS;
         }
 
-        /// <summary>
-        /// Advances progress by the elapsed time. Marks the session Completed (and locks in
-        /// quality) once progress reaches 1.0. No-op unless the session is in progress.
-        /// </summary>
+        // Advances progress by the elapsed time. Marks the session Completed (and locks in
+        // quality) once progress reaches 1.0. No-op unless the session is in progress.
         public void UpdateProgress(float deltaTime)
         {
             if (status == ServiceStatus.IN_PROGRESS)
@@ -70,7 +66,7 @@ namespace PawsAndCare.Services
             }
         }
 
-        // Phase 1 quality: base value scaled by the worker's skill for this service type.
+        // Quality: base value scaled by the worker's skill for this service type.
         private float CalculateQuality()
         {
             float skill = worker.GetSkillRating(service.ServiceType);

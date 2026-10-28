@@ -1,8 +1,6 @@
 namespace PawsAndCare.Services
 {
-    /// <summary>
-    /// Lifecycle states of a ServiceSession.
-    /// </summary>
+    // Lifecycle states of a ServiceSession.
     public enum ServiceStatus
     {
         QUEUED = 0,

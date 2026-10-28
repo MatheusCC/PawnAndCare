@@ -3,14 +3,11 @@ using PawsAndCare.Services;
 
 namespace PawsAndCare.Workers
 {
-    /// <summary>
-    /// A worker's "walk to a station's worker anchor and report arrival" behavior. Sits beside Worker
-    /// (the movement primitive) so job execution stays out of the input layer. In the Phase 2
-    /// auto-assign model, ServiceDispatcher owns the match: it reserves the station, starts the
-    /// session once both worker and pet have arrived, drives progress, and calls Release on
-    /// completion. This runner only walks the worker where told and latches whether it has arrived —
-    /// it knows nothing about sessions, progress, or pets.
-    /// </summary>
+    // A worker's "walk to a station's worker anchor and report arrival" behavior. Sits beside Worker
+    // (the movement primitive) so job execution stays out of the input layer. ServiceDispatcher
+    // owns the match: it reserves the station, starts the session once both worker and pet have
+    // arrived, drives progress, and calls Release on completion. This runner only walks the worker where told and latches whether it has arrived —
+    // it knows nothing about sessions, progress, or pets.
     [RequireComponent(typeof(Worker))]
     public class WorkerServiceRunner : MonoBehaviour
     {
@@ -18,19 +15,15 @@ namespace PawsAndCare.Workers
         private ServiceStation assignedStation;
         private bool hasArrived;
 
-        /// <summary>
-        /// True while the worker is committed to a station (walking there or working it), so
-        /// WorkerManager won't hand it a second job until Release.
-        /// </summary>
+        // True while the worker is committed to a station (walking there or working it), so
+        // WorkerManager won't hand it a second job until Release.
         public bool IsBusy
         {
             get { return assignedStation != null; }
         }
 
-        /// <summary>
-        /// True once the worker has reached its assigned station's worker anchor. The dispatcher
-        /// polls this for the worker side of the both-arrived handshake.
-        /// </summary>
+        // True once the worker has reached its assigned station's worker anchor. The dispatcher
+        // polls this for the worker side of the both-arrived handshake.
         public bool HasArrivedAtStation
         {
             get { return hasArrived; }
@@ -69,10 +62,8 @@ namespace PawsAndCare.Workers
             }
         }
 
-        /// <summary>
-        /// Dispatcher order (Task 5): walk the worker to the station's worker anchor. Reservation and
-        /// session start are owned by the dispatcher, not here.
-        /// </summary>
+        // Dispatcher order: walk the worker to the station's worker anchor. Reservation and
+        // session start are owned by the dispatcher, not here.
         public void GoToStation(ServiceStation station)
         {
             if (station != null && station.WorkerAnchor != null)
@@ -87,9 +78,7 @@ namespace PawsAndCare.Workers
             }
         }
 
-        /// <summary>
-        /// Dispatcher call (Task 5): the job finished (or was cancelled) — free the worker for new work.
-        /// </summary>
+        // Dispatcher call: the job finished (or was cancelled) — free the worker for new work.
         public void Release()
         {
             assignedStation = null;

@@ -2,13 +2,11 @@ using UnityEngine;
 
 namespace PawsAndCare.Core
 {
-    /// <summary>
-    /// Stateless helpers that turn money values into compact display strings, so HUDs hold no
-    /// formatting logic. Values under a thousand show as whole dollars (e.g. "$125", no cents); larger
-    /// values are floored to one decimal and abbreviated with K/M/B/T (e.g. "$1.5K", "$999.9K",
-    /// "$3.4M"). Flooring (not rounding) means the balance is never overstated and never carries to
-    /// the next tier ("$999.9K", not "$1000K"). Negative balances (debt) keep their sign ("-$1.5K").
-    /// </summary>
+    // Stateless helpers that turn money values into compact display strings, so HUDs hold no
+    // formatting logic. Values under a thousand show as whole dollars (e.g. "$125", no cents); larger
+    // values are floored to one decimal and abbreviated with K/M/B/T (e.g. "$1.5K", "$999.9K",
+    // "$3.4M"). Flooring (not rounding) means the balance is never overstated and never carries to
+    // the next tier ("$999.9K", not "$1000K"). Negative balances (debt) keep their sign ("-$1.5K").
     public static class MoneyFormatUtils
     {
         private const float THOUSAND = 1000.0f;
@@ -17,10 +15,8 @@ namespace PawsAndCare.Core
         private const float TRILLION = 1000000000000.0f;
         private const float ONE_DECIMAL_SCALE = 10.0f;
 
-        /// <summary>
-        /// Formats a money amount as a compact currency string: whole dollars under $1,000, and floored
-        /// to one decimal + abbreviated above — e.g. 1599 → "$1.5K", 999950 → "$999.9K".
-        /// </summary>
+        // Formats a money amount as a compact currency string: whole dollars under $1,000, and floored
+        // to one decimal + abbreviated above — e.g. 1599 → "$1.5K", 999950 → "$999.9K".
         public static string Format(float amount)
         {
             string sign = amount < 0.0f ? "-" : "";

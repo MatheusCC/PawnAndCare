@@ -1,9 +1,7 @@
 namespace PawsAndCare.Economy
 {
-    /// <summary>
-    /// Categories of business expense, carried by ExpenseIncurredEvent so the economy can deduct it
-    /// and future reporting can break costs down. Append-only.
-    /// </summary>
+    // Categories of business expense, carried by ExpenseIncurredEvent so the economy can deduct it
+    // and future reporting can break costs down. Append-only.
     public enum ExpenseType
     {
         SALARY = 0,

@@ -1,8 +1,6 @@
 namespace PawsAndCare.Pets
 {
-    /// <summary>
-    /// Physical size class of a pet. Drives NavMesh agent radius and station fit (wired in a later milestone).
-    /// </summary>
+    // Physical size class of a pet. Drives NavMesh agent radius and station fit (wired in a later milestone).
     public enum PetSize
     {
         SMALL = 0,

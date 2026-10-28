@@ -3,12 +3,10 @@ using Unity.AI.Navigation;
 
 namespace PawsAndCare.Building
 {
-    /// <summary>
-    /// Boot-time facility orchestrator. Auto-discovers scene RoomMarkers and GridFootprints, registers
-    /// their rooms/occupancy with the GridSystem, and bakes the NavMesh. All level geometry (floors,
-    /// stations) is authored in the scene; this only wires it into the grid at boot, so there are no
-    /// manual lists to keep in sync.
-    /// </summary>
+    // Boot-time facility orchestrator. Auto-discovers scene RoomMarkers and GridFootprints, registers
+    // their rooms/occupancy with the GridSystem, and bakes the NavMesh. All level geometry (floors,
+    // stations) is authored in the scene; this only wires it into the grid at boot, so there are no
+    // manual lists to keep in sync.
     public class FacilityBuilder : MonoBehaviour
     {
         [SerializeField]
@@ -16,10 +14,8 @@ namespace PawsAndCare.Building
         [SerializeField]
         private NavMeshSurface navMeshSurface = null;
 
-        /// <summary>
-        /// Registers scene rooms + placed objects with the GridSystem and bakes the NavMesh.
-        /// Called by GameManager during boot so ordering vs. other systems (worker spawn) is deterministic.
-        /// </summary>
+        // Registers scene rooms + placed objects with the GridSystem and bakes the NavMesh.
+        // Called by GameManager during boot so ordering vs. other systems (worker spawn) is deterministic.
         public void Build()
         {
             if (gridSystem != null)

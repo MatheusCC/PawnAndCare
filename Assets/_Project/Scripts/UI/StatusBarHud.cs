@@ -6,13 +6,11 @@ using PawsAndCare.Reputation;
 
 namespace PawsAndCare.UI
 {
-    /// <summary>
-    /// Always-on status bar: balance, reputation, day, clock, and phase. Updated purely by events —
-    /// each field is rewritten only when its value actually changes (balance/reputation/day/phase on
-    /// their change events, the clock once per in-game minute), so there is no per-frame work or
-    /// allocation. Current values are pulled once on enable/start for the initial display. Every field
-    /// is optional. Replaces the temporary OnGUI debug HUDs.
-    /// </summary>
+    // Always-on status bar: balance, reputation, day, clock, and phase. Updated purely by events —
+    // each field is rewritten only when its value actually changes (balance/reputation/day/phase on
+    // their change events, the clock once per in-game minute), so there is no per-frame work or
+    // allocation. Current values are pulled once on enable/start for the initial display. Every field
+    // is optional. Replaces the temporary OnGUI debug HUDs.
     public class StatusBarHud : MonoBehaviour
     {
         [SerializeField]

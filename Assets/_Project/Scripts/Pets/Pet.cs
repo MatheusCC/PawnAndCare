@@ -4,11 +4,9 @@ using PawsAndCare.Services;
 
 namespace PawsAndCare.Pets
 {
-    /// <summary>
-    /// A customer pet: a NavMeshAgent wrapper (mirrors Worker) plus its PetDefinition data —
-    /// the service it wants and how long it will wait. Movement + data live here; the lifecycle
-    /// (arrive, queue, get serviced, leave) lives in the sibling PetStateMachine.
-    /// </summary>
+    // A customer pet: a NavMeshAgent wrapper (mirrors Worker) plus its PetDefinition data —
+    // the service it wants and how long it will wait. Movement + data live here; the lifecycle
+    // (arrive, queue, get serviced, leave) lives in the sibling PetStateMachine.
     [RequireComponent(typeof(NavMeshAgent))]
     public class Pet : MonoBehaviour
     {
@@ -17,6 +15,8 @@ namespace PawsAndCare.Pets
         private PetDefinition petDefinition = null;
 
         private NavMeshAgent navMeshAgent;
+        private Vector3 standPosition;
+        private bool isSeated;
 
         private void Awake()
         {
@@ -28,9 +28,7 @@ namespace PawsAndCare.Pets
             }
         }
 
-        /// <summary>
-        /// Returns the service this pet arrives wanting, or GROOMING as a fallback if no definition is assigned.
-        /// </summary>
+        // Returns the service this pet arrives wanting, or GROOMING as a fallback if no definition is assigned.
         public ServiceType GetDesiredService()
         {
             ServiceType result = ServiceType.GROOMING;
@@ -43,9 +41,7 @@ namespace PawsAndCare.Pets
             return result;
         }
 
-        /// <summary>
-        /// Returns the seconds this pet will wait in the queue before leaving unhappy, or 0 if no definition is assigned.
-        /// </summary>
+        // Returns the seconds this pet will wait in the queue before leaving unhappy, or 0 if no definition is assigned.
         public float GetPatience()
         {
             float result = 0.0f;
@@ -58,10 +54,34 @@ namespace PawsAndCare.Pets
             return result;
         }
 
+        // Lifts the pet off the NavMesh and places it on a seat (e.g. on top of a station).
+        public void SitAt(Transform seat)
+        {
+            if (seat != null && navMeshAgent != null && !isSeated)
+            {
+                // Remember the floor spot we arrived on so StandUp can drop the pet back onto the mesh.
+                // The agent must be disabled while seated — an active agent pins the transform to the
+                // NavMesh and would snap the pet straight back down to the floor.
+                standPosition = transform.position;
+                navMeshAgent.enabled = false;
+                transform.SetPositionAndRotation(seat.position, seat.rotation);
+                isSeated = true;
+            }
+        }
 
-        /// <summary>
-        /// Commands the pet to move to a world position using NavMesh pathfinding.
-        /// </summary>
+        // Returns a seated pet to the floor spot it sat down from and re-enables navigation.
+        public void StandUp()
+        {
+            if (isSeated)
+            {
+                transform.position = standPosition;
+                navMeshAgent.enabled = true;
+                navMeshAgent.Warp(standPosition);
+                isSeated = false;
+            }
+        }
+
+        // Commands the pet to move to a world position using NavMesh pathfinding.
         public void MoveTo(Vector3 destination)
         {
             if (navMeshAgent != null && navMeshAgent.isOnNavMesh)
@@ -70,9 +90,7 @@ namespace PawsAndCare.Pets
             }
         }
 
-        /// <summary>
-        /// Returns true only when the pet has actually arrived at its destination.
-        /// </summary>
+        // Returns true only when the pet has actually arrived at its destination.
         public bool HasReachedDestination()
         {
             const float ARRIVAL_SPEED_SQR_THRESHOLD = 0.01f;

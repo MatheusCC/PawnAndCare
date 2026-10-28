@@ -5,16 +5,14 @@ using PawsAndCare.Economy;
 
 namespace PawsAndCare.Workers
 {
-    /// <summary>
-    /// The staff/HR system — a facility-wide scene component (not a singleton; nothing queries it
-    /// globally, it only reacts to events and the hire panel). Grows a worker's skill each time it
-    /// completes a service, pays daily salaries at day end, and hires new workers on demand. Skill
-    /// growth feeds service quality and reputation; salaries make the economy a real
-    /// income-vs-payroll loop. The hire UI reads HireOptions and calls TryHire.
-    /// </summary>
+    // The staff/HR system — a facility-wide scene component (not a singleton; nothing queries it
+    // globally, it only reacts to events and the hire panel). Grows a worker's skill each time it
+    // completes a service, pays daily salaries at day end, and hires new workers on demand. Skill
+    // growth feeds service quality and reputation; salaries make the economy a real
+    // income-vs-payroll loop. The hire UI reads HireOptions and calls TryHire.
     public class StaffDirector : MonoBehaviour
     {
-        /// <summary>A hireable worker option surfaced to the UI: what it is and what it costs.</summary>
+        // A hireable worker option surfaced to the UI: what it is and what it costs.
         public readonly struct HireOption
         {
             private readonly WorkerRole role;
@@ -31,11 +29,9 @@ namespace PawsAndCare.Workers
                 get { return hireCost; }
             }
 
-            /// <summary>
-            /// True only for options built through the constructor. A mis-authored prefab (missing
-            /// Worker component) leaves the default struct in the array — invalid, so the UI skips it
-            /// and TryHire refuses it instead of hiring a broken worker for free.
-            /// </summary>
+            // True only for options built through the constructor. A mis-authored prefab (missing
+            // Worker component) leaves the default struct in the array — invalid, so the UI skips it
+            // and TryHire refuses it instead of hiring a broken worker for free.
             public bool IsValid
             {
                 get { return isValid; }
@@ -66,7 +62,7 @@ namespace PawsAndCare.Workers
         // per-frame GetComponent. Index-aligned with hireablePrefabs.
         private HireOption[] hireOptions;
 
-        /// <summary>The hireable options, index-aligned with TryHire's index parameter.</summary>
+        // The hireable options, index-aligned with TryHire's index parameter.
         public IReadOnlyList<HireOption> HireOptions
         {
             get { return hireOptions; }
@@ -110,11 +106,9 @@ namespace PawsAndCare.Workers
             }
         }
 
-        /// <summary>
-        /// Hires the candidate at the given index if it is valid and affordable: charges the hire cost
-        /// and spawns the worker (which self-registers with WorkerManager on Start). Validated before
-        /// charging so we never bill without placing the worker. Returns true on success.
-        /// </summary>
+        // Hires the candidate at the given index if it is valid and affordable: charges the hire cost
+        // and spawns the worker (which self-registers with WorkerManager on Start). Validated before
+        // charging so we never bill without placing the worker. Returns true on success.
         public bool TryHire(int index)
         {
             bool hired = false;

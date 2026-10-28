@@ -3,13 +3,11 @@ using PawsAndCare.Core;
 
 namespace PawsAndCare.Economy
 {
-    /// <summary>
-    /// Owns the business's running balance and the current day's revenue. Turns completed services
-    /// into revenue: subscribes to ServiceCompletedEvent, charges the service's BasePrice scaled by
-    /// the achieved quality, and publishes BalanceChangedEvent. Tracks DailyRevenue (reset each day
-    /// start) so the end-of-day summary can read it. Every balance change funnels through ApplyDelta,
-    /// so future spending (staff salaries, Task 11) reuses the same chokepoint.
-    /// </summary>
+    // Owns the business's running balance and the current day's revenue. Turns completed services
+    // into revenue: subscribes to ServiceCompletedEvent, charges the service's BasePrice scaled by
+    // the achieved quality, and publishes BalanceChangedEvent. Tracks DailyRevenue (reset each day
+    // start) so the end-of-day summary can read it. Every balance change funnels through ApplyDelta,
+    // so all spending (salaries, hiring) shares the same chokepoint.
     public class EconomyManager : Singleton<EconomyManager>
     {
         [SerializeField]
@@ -70,8 +68,7 @@ namespace PawsAndCare.Economy
 
         private void OnDayEnded(DayEndedEvent eventData)
         {
-            // Minimal end-of-day revenue summary (6B.2). The full-screen summary panel (TDD §9.3) is
-            // deferred to the polish pass.
+            // Logs the day's revenue summary.
 #if UNITY_EDITOR
             Debug.Log($"[EconomyManager] Day {eventData.DayNumber} ended — revenue ${dailyRevenue:0.00}, balance ${balance:0.00}.");
 #endif

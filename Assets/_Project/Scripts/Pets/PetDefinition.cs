@@ -3,10 +3,8 @@ using PawsAndCare.Services;
 
 namespace PawsAndCare.Pets
 {
-    /// <summary>
-    /// Customer pet template: species, size, temperament, the service it arrives wanting,
-    /// how long it will wait in the queue, and its visual.
-    /// </summary>
+    // Customer pet template: species, size, temperament, the service it arrives wanting,
+    // how long it will wait in the queue, and its visual.
     [CreateAssetMenu(fileName = "Pet_", menuName = "PawsAndCare/Pets/Pet Definition")]
     public class PetDefinition : ScriptableObject
     {

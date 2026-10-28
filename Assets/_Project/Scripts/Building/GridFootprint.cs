@@ -3,12 +3,10 @@ using UnityEngine;
 
 namespace PawsAndCare.Building
 {
-    /// <summary>
-    /// Marks the grid cells a placed object (station/furniture/decoration) occupies. Cells are derived
-    /// from the object's world position and its Blueprint footprint — placement and boot registration
-    /// both call Occupy, and rearrange/sell call Free. Carrying the Blueprint also lets sell/refund and
-    /// save/load know what this instance is.
-    /// </summary>
+    // Marks the grid cells a placed object (station/furniture/decoration) occupies. Cells are derived
+    // from the object's world position and its Blueprint footprint — placement and boot registration
+    // both call Occupy, and rearrange/sell call Free. Carrying the Blueprint also lets sell/refund and
+    // save/load know what this instance is.
     public class GridFootprint : MonoBehaviour
     {
         [SerializeField]
@@ -28,10 +26,8 @@ namespace PawsAndCare.Building
             get { return occupiedCells; }
         }
 
-        /// <summary>
-        /// Stamps this object's footprint cells as occupied, deriving them from its world position.
-        /// Convention: transform.position is the footprint's world centre.
-        /// </summary>
+        // Stamps this object's footprint cells as occupied, deriving them from its world position.
+        // Convention: transform.position is the footprint's world centre.
         public void Occupy(GridSystem grid)
         {
             if (grid != null)
@@ -69,7 +65,7 @@ namespace PawsAndCare.Building
             }
         }
 
-        /// <summary>Frees the cells this object occupied (for rearrange/sell). Safe to call when unoccupied.</summary>
+        // Frees the cells this object occupied (for rearrange/sell). Safe to call when unoccupied.
         public void Free()
         {
             if (gridSystem != null)
